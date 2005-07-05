@@ -30,8 +30,10 @@ def confirm(q):
 		if ans in ('y', 'yes'): return True
 		if ans in ('n', 'no'): return False
 
-if not os.path.exists(interface):
+if os.path.exists(interface):
+	from update import update
+	update(interface)
+else:
 	if confirm("Interface file '%s' does not exist. Create it?" % interface):
 		from create import create
 		create(interface)
-	sys.exit(0)
