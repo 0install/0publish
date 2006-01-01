@@ -3,17 +3,21 @@ import tempfile, os, base64
 
 def check_signature(path):
 	data = file(path).read()
-	if data.startswith('BEGIN'):
-		data_stream, sigs = gpg.check_stream(file(path))
-		sign_fn = sign_plain
-	elif '\n<!-- Base64 Signature' in data:
+	xml_comment = data.rfind('\n<!-- Base64 Signature')
+	if xml_comment >= 0:
 		data_stream, sigs = gpg.check_stream(file(path))
 		sign_fn = sign_xml
+		data = data[:xml_comment + 1]
+		data_stream.close()
+	elif data.startswith('BEGIN'):
+		data_stream, sigs = gpg.check_stream(file(path))
+		sign_fn = sign_plain
+		data = data_stream.read()
 	else:
 		return data, sign_unsigned, None
 	for sig in sigs:
 		if isinstance(sig, gpg.ValidSig):
-			return data_stream.read(), sign_fn, sig.fingerprint
+			return data, sign_fn, sig.fingerprint
 	raise Exception('No valid signatures found!')
 
 def write_tmp(path, data):

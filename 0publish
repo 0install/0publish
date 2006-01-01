@@ -55,6 +55,9 @@ if options.xmlsign:
 if options.key:
 	print "Changing key from '%s' to '%s'" % (key, options.key)
 	key = options.key
+if options.edit:
+	import edit
+	data = edit.edit(data)
 
 print "Data", data
 print "Sign", sign_fn
