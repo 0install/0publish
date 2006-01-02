@@ -11,12 +11,15 @@ version = '0.1'
 parser = OptionParser(usage="usage: %prog [options] interface")
 parser.add_option("-k", "--key", help="key to use for signing")
 parser.add_option("-e", "--edit", help="edit with $EDITOR", action='store_true')
+parser.add_option("-l", "--local", help="create feed from local interface")
 parser.add_option("-r", "--release", help="set versions and dates", action='store_true')
 parser.add_option("-x", "--xmlsign", help="add an XML signature block", action='store_true')
 parser.add_option("-v", "--verbose", help="more verbose output", action='count')
 parser.add_option("-V", "--version", help="display version information", action='store_true')
 
 (options, args) = parser.parse_args()
+
+force_save = False
 
 if options.version:
 	print "0publish (zero-install) " + version
@@ -50,8 +53,19 @@ def confirm(q):
 # Load or create the starting data...
 
 if os.path.exists(interface):
+	if options.local:
+		raise Exception("Can't use --local; file '%s' already exists!" % interface)
 	contents = file(interface).read()
 	data, sign_fn, key = signing.check_signature(interface)
+elif options.local:
+	import create
+	if os.path.exists(options.local):
+		data = create.create_from_local(options.local)
+		sign_fn = signing.sign_unsigned
+		key = None
+		force_save = True
+	else:
+		raise Exception("File '%s' does not exist." % options.local)
 else:
 	if confirm("Interface file '%s' does not exist. Create it?" % interface):
 		from create import create
@@ -114,11 +128,12 @@ while True:
 		if ans in ('a', 'abort'): sys.exit(1)
 
 
-if old_data == data and sign_fn == old_sign_fn and key == old_key:
+if (old_data == data and sign_fn == old_sign_fn and key == old_key) and not force_save:
 	print "Interface unchanged. Not writing."
 	sys.exit(1)
 
 # Write it back out
+if not data.endswith('\n'): data += '\n'
 sign_fn(interface, data, key)
 
 print "Wrote", interface
