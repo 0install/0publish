@@ -4,6 +4,7 @@ from optparse import OptionParser
 import os, sys
 import signing
 from logging import info, debug
+import edit, validator
 
 version = '0.1'
 
@@ -75,10 +76,23 @@ if options.key:
 	print "Changing key from '%s' to '%s'" % (key, options.key)
 	key = options.key
 if options.edit:
-	import edit
 	data = edit.edit(data)
 
-# Validate the result...
+while True:
+	# Validate the result...
+	try:
+		validator.check(data)
+		break
+	except validator.InvalidInterface, ex:
+		print "Invalid interface: " + str(ex)
+
+	while True:
+		ans = raw_input("Interface is invalid. (E)dit or (A)bort?").lower()
+		if ans in ('e', 'edit'):
+			data = edit.edit(data)
+			break
+		if ans in ('a', 'abort'): sys.exit(1)
+
 
 if old_data == data and sign_fn == old_sign_fn and key == old_key:
 	print "Interface unchanged. Not writing."
