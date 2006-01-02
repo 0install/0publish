@@ -53,8 +53,6 @@ def confirm(q):
 # Load or create the starting data...
 
 if os.path.exists(interface):
-	if options.local:
-		raise Exception("Can't use --local; file '%s' already exists!" % interface)
 	contents = file(interface).read()
 	data, sign_fn, key = signing.check_signature(interface)
 elif options.local:
@@ -109,6 +107,9 @@ if options.key:
 if options.release:
 	import release
 	data = release.make_release(data)
+if options.local:
+	import merge
+	data = merge.merge(data, options.local)
 if options.edit:
 	data = edit.edit(data)
 
