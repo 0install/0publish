@@ -3,12 +3,9 @@ from xml.dom import minidom, XMLNS_NAMESPACE
 from zeroinstall.injector.namespaces import XMLNS_IFACE
 from zeroinstall.injector import model, reader
 
-_local_template = """<?xml version="1.0" ?>
+_local_template_start = """<?xml version="1.0" ?>
 <?xml-stylesheet type='text/xsl'
      href='http://0install.net/2006/stylesheets/interface.xsl'?>
-
-<interface xmlns="http://zero-install.sourceforge.net/2004/injector/interface">
-</interface>
 """
 
 _template = """<?xml version="1.0" ?>
@@ -63,16 +60,17 @@ def create(f):
 def create_from_local(local):
 	iface = model.Interface(os.path.abspath(local))
 	reader.update(iface, local, local = True)
-	doc = minidom.parseString(_local_template)
+	doc = minidom.parseString(_local_template_start +
+		'<interface xmlns="http://zero-install.sourceforge.net/2004/injector/interface"/>')
 	root = doc.documentElement
 	def element(uri, localName, data):
-		root.appendChild(doc.createTextNode('\n'))
+		root.appendChild(doc.createTextNode('\n  '))
 		element = doc.createElementNS(uri, localName)
 		element.appendChild(doc.createTextNode(data))
 		return element
 	root.appendChild(element(XMLNS_IFACE, 'name', iface.name))
 	root.appendChild(element(XMLNS_IFACE, 'summary', iface.summary))
-	root.appendChild(element(XMLNS_IFACE, 'description', iface.description))
+	root.appendChild(element(XMLNS_IFACE, 'description', iface.description + '\n  '))
 
 	if not iface.feed_for:
 		raise Exception("No <feed-for> in '%s'; can't use it as a local feed." % local)
@@ -82,4 +80,13 @@ def create_from_local(local):
 
 	root.setAttribute('uri', uri)
 
-	return doc.toxml()
+	local_doc = minidom.parse(local)
+	for icon in local_doc.getElementsByTagNameNS(XMLNS_IFACE, 'icon'):
+		if icon.parentNode is local_doc.documentElement:
+			root.appendChild(doc.createTextNode('\n  '))
+			root.appendChild(doc.importNode(icon, True))
+
+	root.appendChild(doc.createTextNode('\n'))
+
+	# minidom's writer loses the newline after the PI
+	return _local_template_start + root.toxml()
