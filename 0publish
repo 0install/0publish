@@ -11,6 +11,7 @@ version = '0.1'
 parser = OptionParser(usage="usage: %prog [options] interface")
 parser.add_option("-k", "--key", help="key to use for signing")
 parser.add_option("-e", "--edit", help="edit with $EDITOR", action='store_true')
+parser.add_option("-r", "--release", help="set versions and dates", action='store_true')
 parser.add_option("-x", "--xmlsign", help="add an XML signature block", action='store_true')
 parser.add_option("-v", "--verbose", help="more verbose output", action='count')
 parser.add_option("-V", "--version", help="display version information", action='store_true')
@@ -69,12 +70,31 @@ old_data = data
 old_sign_fn = sign_fn
 old_key = key
 
+while True:
+	# Validate the input...
+	try:
+		validator.check(data)
+		break
+	except validator.InvalidInterface, ex:
+		print "Invalid interface: " + str(ex)
+
+	while True:
+		ans = raw_input("Interface is invalid. (E)dit or (A)bort?").lower()
+		if ans in ('e', 'edit'):
+			data = edit.edit(data)
+			options.edit = False	# Don't edit twice
+			break
+		if ans in ('a', 'abort'): sys.exit(1)
+
 # Process it...
 if options.xmlsign:
 	sign_fn = signing.sign_xml
 if options.key:
 	print "Changing key from '%s' to '%s'" % (key, options.key)
 	key = options.key
+if options.release:
+	import release
+	data = release.make_release(data)
 if options.edit:
 	data = edit.edit(data)
 
