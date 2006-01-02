@@ -56,5 +56,6 @@ def sign_xml(path, data, key):
 		os.unlink(tmp)
 	tmp += '.sig'
 	encoded = base64.encodestring(file(tmp).read())
+	os.unlink(tmp)
 	sig = "<!-- Base64 Signature\n" + encoded + "\n-->\n"
 	os.rename(write_tmp(path, data + sig), path)
