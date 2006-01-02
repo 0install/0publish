@@ -1,5 +1,5 @@
 from zeroinstall.injector import gpg
-import tempfile, os, base64
+import tempfile, os, base64, sys
 
 def check_signature(path):
 	data = file(path).read()
@@ -18,7 +18,13 @@ def check_signature(path):
 	for sig in sigs:
 		if isinstance(sig, gpg.ValidSig):
 			return data, sign_fn, sig.fingerprint
-	raise Exception('No valid signatures found!')
+	print "ERROR: No valid signatures found!"
+	for sig in sigs:
+		print "Got:", sig
+	ok = raw_input('Ignore and load anyway? (y/N) ').lower()
+	if ok and 'yes'.startswith(ok):
+		return data, sign_unsigned, None
+	sys.exit(1)
 
 def write_tmp(path, data):
 	"""Create a temporary file in the same directory as 'path' and write data to it."""
