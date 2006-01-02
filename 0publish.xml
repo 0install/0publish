@@ -1,0 +1,28 @@
+<?xml version="1.0" ?>
+<?xml-stylesheet type='text/xsl'
+     href='http://0install.net/2006/stylesheets/interface.xsl'?>
+
+<interface xmlns="http://zero-install.sourceforge.net/2004/injector/interface">
+  <name>0publish</name>
+  <summary>utility to make creating injector interfaces easier</summary>
+  <description>
+    0publish makes creating and modifying injector interface files easier.
+    It can create a new commented template for you or edit an existing one.
+
+    Various editing operations are available, the most basic being to let you
+    edit it in your preferred text editor. It automatically removes the
+    signature when loading an interface and creates a new one when writing it
+    back out. It will also validate the new version before saving it.
+
+    A tutorial on 0publish can be found at
+    http://0install.net/injector-packagers.html.
+  </description>
+
+  <!-- Optionally, uncomment this to give the address of
+       the signed master interface: -->
+  <!-- <feed-for interface='http://site/interface'> -->
+
+  <group main='0publish'>
+    <implementation id="." version="0.1" released='Snapshot'/>
+  </group>
+</interface>
