@@ -9,10 +9,14 @@ import edit, validator
 version = '0.1'
 
 parser = OptionParser(usage="usage: %prog [options] interface")
+parser.add_option("-a", "--archive", help="add archive and set ID", action='append', metavar='URL')
 parser.add_option("-k", "--key", help="key to use for signing")
 parser.add_option("-e", "--edit", help="edit with $EDITOR", action='store_true')
 parser.add_option("-l", "--local", help="create feed from local interface")
-parser.add_option("-r", "--release", help="set versions and dates", action='store_true')
+parser.add_option("--set-id", help="set implementation ID", action='store', metavar='DIGEST')
+parser.add_option("--set-released", help="set release date", action='store', metavar='DATE')
+parser.add_option("--set-stability", help="set stability", action='store', metavar='STABILITY')
+parser.add_option("--set-version", help="set version number", action='store', metavar='VERSION')
 parser.add_option("-x", "--xmlsign", help="add an XML signature block", action='store_true')
 parser.add_option("-v", "--verbose", help="more verbose output", action='count')
 parser.add_option("-V", "--version", help="display version information", action='store_true')
@@ -104,9 +108,14 @@ if options.xmlsign:
 if options.key:
 	print "Changing key from '%s' to '%s'" % (key, options.key)
 	key = options.key
-if options.release:
+if options.set_id or options.set_version or options.set_released or options.set_stability:
 	import release
-	data = release.make_release(data)
+	data = release.make_release(data, options.set_id,
+		options.set_version, options.set_released, options.set_stability)
+if options.archive:
+	import archive
+	for a in options.archive:
+		data = archive.add_archive(data, a)
 if options.local:
 	import merge
 	data = merge.merge(data, options.local)
