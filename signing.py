@@ -9,7 +9,7 @@ def check_signature(path):
 		sign_fn = sign_xml
 		data = data[:xml_comment + 1]
 		data_stream.close()
-	elif data.startswith('BEGIN'):
+	elif data.startswith('-----BEGIN'):
 		data_stream, sigs = gpg.check_stream(file(path))
 		sign_fn = sign_plain
 		data = data_stream.read()
