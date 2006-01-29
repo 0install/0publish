@@ -149,4 +149,4 @@ if (old_data == data and sign_fn == old_sign_fn and key == old_key) and not forc
 if not data.endswith('\n'): data += '\n'
 sign_fn(interface, data, key)
 
-print "Wrote", interface
+info("Wrote '%S'", interface)
