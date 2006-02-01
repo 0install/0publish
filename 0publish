@@ -19,6 +19,7 @@ parser.add_option("--set-id", help="set implementation ID", action='store', meta
 parser.add_option("--set-released", help="set release date", action='store', metavar='DATE')
 parser.add_option("--set-stability", help="set stability", action='store', metavar='STABILITY')
 parser.add_option("--set-version", help="set version number", action='store', metavar='VERSION')
+parser.add_option("-s", "--stable", help="mark testing version stable", action='store_true')
 parser.add_option("-x", "--xmlsign", help="add an XML signature block", action='store_true')
 parser.add_option("-v", "--verbose", help="more verbose output", action='count')
 parser.add_option("-V", "--version", help="display version information", action='store_true')
@@ -114,6 +115,9 @@ if options.set_id or options.set_version or options.set_released or options.set_
 	import release
 	data = release.make_release(data, options.set_id,
 		options.set_version, options.set_released, options.set_stability)
+if options.stable:
+	import stable
+	data = stable.mark_stable(data)
 if options.archive_url:
 	import archive
 	data = archive.add_archive(data, options.archive_url, options.archive_file, options.archive_extract)
