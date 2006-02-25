@@ -4,6 +4,7 @@ from zeroinstall.injector.namespaces import XMLNS_IFACE
 from zeroinstall.injector import model, reader
 
 def merge(data, local):
+	raise Exception('Sorry, --local not yet supported')
 	local_doc = minidom.parse(local)
 	master_doc = minidom.parseString(data)
 
