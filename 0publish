@@ -6,7 +6,7 @@ import signing
 from logging import info, debug
 import edit, validator
 
-version = '0.1'
+version = '0.2'
 
 parser = OptionParser(usage="usage: %prog [options] interface")
 parser.add_option("--archive-url", help="add archive at this URL", action='store', metavar='URL')
