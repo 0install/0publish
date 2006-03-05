@@ -17,6 +17,8 @@ parser.add_option("-g", "--gpgsign", help="add a GPG signature block", action='s
 parser.add_option("-k", "--key", help="key to use for signing")
 parser.add_option("-l", "--local", help="create feed from local interface")
 parser.add_option("--set-id", help="set implementation ID", action='store', metavar='DIGEST')
+parser.add_option("--set-main", help="set main executable", action='store', metavar='EXEC')
+parser.add_option("--set-arch", help="set architecture", action='store', metavar='ARCH')
 parser.add_option("--set-released", help="set release date", action='store', metavar='DATE')
 parser.add_option("--set-stability", help="set stability", action='store', metavar='STABILITY')
 parser.add_option("--set-version", help="set version number", action='store', metavar='VERSION')
@@ -114,10 +116,12 @@ if options.gpgsign:
 if options.key:
 	print "Changing key from '%s' to '%s'" % (key, options.key)
 	key = options.key
-if options.set_id or options.set_version or options.set_released or options.set_stability:
+if options.set_id or options.set_version or options.set_released or \
+   options.set_stability or options.set_arch or options.set_main:
 	import release
 	data = release.make_release(data, options.set_id,
-		options.set_version, options.set_released, options.set_stability)
+		options.set_version, options.set_released, options.set_stability,
+		options.set_main, options.set_arch)
 if options.stable:
 	import stable
 	data = stable.mark_stable(data)

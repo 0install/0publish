@@ -4,7 +4,7 @@ import time, re
 
 date_format = '\d{4}-\d{2}-\d{2}'
 
-def make_release(data, id, version, released, stability):
+def make_release(data, id, version, released, stability, main, arch):
 	"""Normally there's only one implementation, but we can cope with several."""
 	if released and released != 'Snapshot' and not re.match(date_format, released):
 		raise Exception('Invalid date format. Use YYYY-MM-DD.')
@@ -31,5 +31,7 @@ def make_release(data, id, version, released, stability):
 		if version is not None: x.setAttribute('version', version)
 		if released is not None: x.setAttribute('released', released)
 		if stability is not None: x.setAttribute('stability', stability)
+		if main is not None: x.setAttribute('main', main)
+		if arch is not None: x.setAttribute('arch', arch)
 	
 	return doc.toxml()
