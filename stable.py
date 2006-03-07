@@ -22,6 +22,6 @@ def get_stability(x):
 	root = x.ownerDocument.documentElement
 	while x is not root:
 		stab = x.getAttribute('stability')
-		if stab is not None: return stab
+		if stab: return stab
 		x = x.parentNode
 	return 'testing'
