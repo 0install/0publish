@@ -49,9 +49,8 @@ def sign_plain(path, data, key):
 	tmp = write_tmp(path, data)
 	try:
 		run_gpg(key, '--clearsign', tmp)
-	except:
+	finally:
 		os.unlink(tmp)
-		raise
 	os.rename(tmp + '.asc', path)
 
 def sign_xml(path, data, key):
