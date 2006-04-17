@@ -24,6 +24,9 @@ _template = """<?xml version="1.0" ?>
     Use a blank line to separate paragraphs.
   </description>
 
+  <!-- Optionally, uncomment this to specify the program's homepage: -->
+  <!-- <homepage>http://site/prog</homepage> -->
+
   <!-- Optionally, uncomment this to specify an icon: -->
   <!-- <icon href='http://site/icon.png' type='image/png'/> -->
 
