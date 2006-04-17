@@ -17,6 +17,7 @@
     A tutorial on 0publish can be found at
     http://0install.net/injector-packagers.html.
   </description>
+  <homepage>http://0install.net/injector-packagers.html</homepage>
 
   <feed-for interface='http://0install.net/2006/interfaces/0publish'/>
 
