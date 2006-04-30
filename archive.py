@@ -1,20 +1,27 @@
 from xml.dom import minidom
-from zeroinstall.zerostore import Store, manifest
+from zeroinstall.zerostore import Store, manifest, unpack
 from zeroinstall.injector import namespaces
 import os, time, re, shutil, tempfile, sha
-import unpack
 
-def manifest_for_dir(dir):
-	digest = sha.new()
-	for line in manifest.generate_manifest(dir):
+def manifest_for_dir(dir, alg):
+	algorithm = manifest.get_algorithm(alg)
+	digest = algorithm.new_digest()
+	for line in algorithm.generate_manifest(dir):
 		digest.update(line + '\n')
-	return 'sha1=' + digest.hexdigest()
+	return algorithm.getID(digest)
 
 def add_archive(data, url, local_file, extract):
 	if local_file is None:
 		raise Exception('Use --archive-file option to specify a local copy')
 
 	doc = minidom.parseString(data)
+
+	if local_file.endswith('.deb'):
+		# Debs require 0launch >= 0.20 anyway, so use the new hash to avoid
+		# problems with directory mtimes
+		alg = 'sha1new'
+	else:
+		alg = 'sha1'
 
 	all_impls = doc.documentElement.getElementsByTagNameNS(namespaces.XMLNS_IFACE, 'implementation')
 	tmpdir = tempfile.mkdtemp('-0publish')
@@ -25,7 +32,7 @@ def add_archive(data, url, local_file, extract):
 		else:
 			extracted = tmpdir
 
-		archive_id = manifest_for_dir(extracted)
+		archive_id = manifest_for_dir(extracted, alg)
 	finally:
 		shutil.rmtree(tmpdir)
 
