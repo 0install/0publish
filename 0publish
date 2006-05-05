@@ -72,6 +72,7 @@ elif options.local:
 		sign_fn = signing.sign_unsigned
 		key = None
 		force_save = True
+		options.local = False
 	else:
 		raise Exception("File '%s' does not exist." % options.local)
 else:

@@ -1,5 +1,5 @@
 import os
-from xml.dom import minidom, XMLNS_NAMESPACE
+from xml.dom import minidom, XMLNS_NAMESPACE, Node
 from zeroinstall.injector.namespaces import XMLNS_IFACE
 from zeroinstall.injector import model, reader
 
@@ -60,34 +60,36 @@ def create(f):
 	name = os.path.basename(f)
 	return _template % (name.split('.', 1)[0])
 
+def remove_with_preceding_comments(element):
+	root = element.ownerDocument.documentElement
+	to_remove = [element]
+	node = element
+	while node.previousSibling:
+		node = node.previousSibling
+		if node.nodeType == Node.COMMENT_NODE or \
+		   (node.nodeType == Node.TEXT_NODE and node.nodeValue.strip() == ''):
+			to_remove.append(node)
+		else:
+			break
+	for x in to_remove:
+		root.removeChild(x)
+
 def create_from_local(local):
 	iface = model.Interface(os.path.abspath(local))
 	reader.update(iface, local, local = True)
-	doc = minidom.parseString(_local_template_start +
-		'<interface xmlns="http://zero-install.sourceforge.net/2004/injector/interface"/>')
-	root = doc.documentElement
-	def element(uri, localName, data):
-		root.appendChild(doc.createTextNode('\n  '))
-		element = doc.createElementNS(uri, localName)
-		element.appendChild(doc.createTextNode(data))
-		return element
-	root.appendChild(element(XMLNS_IFACE, 'name', iface.name))
-	root.appendChild(element(XMLNS_IFACE, 'summary', iface.summary))
-	root.appendChild(element(XMLNS_IFACE, 'description', iface.description + '\n  '))
-
 	if not iface.feed_for:
 		raise Exception("No <feed-for> in '%s'; can't use it as a local feed." % local)
 	if len(iface.feed_for) != 1:
 		raise Exception("Multiple <feed-for> elements. Not supported, sorry!")
 	uri = iface.feed_for.keys()[0]
 
+	doc = minidom.parse(local)
+	root = doc.documentElement
 	root.setAttribute('uri', uri)
 
-	local_doc = minidom.parse(local)
-	for icon in local_doc.getElementsByTagNameNS(XMLNS_IFACE, 'icon'):
-		if icon.parentNode is local_doc.documentElement:
-			root.appendChild(doc.createTextNode('\n  '))
-			root.appendChild(doc.importNode(icon, True))
+	for element in root.getElementsByTagNameNS(XMLNS_IFACE, 'feed-for'):
+		if element.parentNode is root:
+			remove_with_preceding_comments(element)
 
 	root.appendChild(doc.createTextNode('\n'))
 
