@@ -10,7 +10,7 @@ def manifest_for_dir(dir, alg):
 		digest.update(line + '\n')
 	return algorithm.getID(digest)
 
-def add_archive(data, url, local_file, extract):
+def add_archive(data, url, local_file, extract, alg):
 	if local_file is None:
 		local_file = os.path.abspath(os.path.basename(url))
 		if not os.path.exists(local_file):
@@ -19,12 +19,13 @@ def add_archive(data, url, local_file, extract):
 
 	doc = minidom.parseString(data)
 
-	if local_file.endswith('.deb'):
-		# Debs require 0launch >= 0.20 anyway, so use the new hash to avoid
-		# problems with directory mtimes
-		alg = 'sha1new'
-	else:
-		alg = 'sha1'
+	if alg is None:
+		if local_file.endswith('.deb'):
+			# Debs require 0launch >= 0.20 anyway, so use the new hash to avoid
+			# problems with directory mtimes
+			alg = 'sha1new'
+		else:
+			alg = 'sha1'
 
 	all_impls = doc.documentElement.getElementsByTagNameNS(namespaces.XMLNS_IFACE, 'implementation')
 	tmpdir = tempfile.mkdtemp('-0publish')

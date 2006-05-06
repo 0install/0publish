@@ -6,7 +6,7 @@ import signing
 from logging import info, debug
 import edit, validator
 
-version = '0.2'
+version = '0.3'
 
 parser = OptionParser(usage="usage: %prog [options] interface")
 parser.add_option("--archive-url", help="add archive at this URL", action='store', metavar='URL')
@@ -16,6 +16,7 @@ parser.add_option("-e", "--edit", help="edit with $EDITOR", action='store_true')
 parser.add_option("-g", "--gpgsign", help="add a GPG signature block", action='store_true')
 parser.add_option("-k", "--key", help="key to use for signing")
 parser.add_option("-l", "--local", help="create feed from local interface")
+parser.add_option("--manifest-algorithm", help="select algorithm for manifests", action='store', metavar='ALG')
 parser.add_option("--set-id", help="set implementation ID", action='store', metavar='DIGEST')
 parser.add_option("--set-main", help="set main executable", action='store', metavar='EXEC')
 parser.add_option("--set-arch", help="set architecture", action='store', metavar='ARCH')
@@ -128,7 +129,7 @@ if options.stable:
 	data = stable.mark_stable(data)
 if options.archive_url:
 	import archive
-	data = archive.add_archive(data, options.archive_url, options.archive_file, options.archive_extract)
+	data = archive.add_archive(data, options.archive_url, options.archive_file, options.archive_extract, options.manifest_algorithm)
 elif options.archive_file or options.archive_extract:
 	raise Exception('Must use --archive-uri option')
 if options.local:
