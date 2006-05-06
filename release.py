@@ -6,6 +6,7 @@ date_format = '\d{4}-\d{2}-\d{2}'
 
 def make_release(data, id, version, released, stability, main, arch):
 	"""Normally there's only one implementation, but we can cope with several."""
+	if released == 'today': released = time.strftime('%Y-%m-%d')
 	if released and released != 'Snapshot' and not re.match(date_format, released):
 		raise Exception('Invalid date format. Use YYYY-MM-DD.')
 

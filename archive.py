@@ -12,7 +12,10 @@ def manifest_for_dir(dir, alg):
 
 def add_archive(data, url, local_file, extract):
 	if local_file is None:
-		raise Exception('Use --archive-file option to specify a local copy')
+		local_file = os.path.abspath(os.path.basename(url))
+		if not os.path.exists(local_file):
+			raise Exception("Use --archive-file option to specify a local copy of the archive "
+					"(default file '%s' does not exist)" % local_file)
 
 	doc = minidom.parseString(data)
 
