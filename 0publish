@@ -9,6 +9,7 @@ import edit, validator
 version = '0.3'
 
 parser = OptionParser(usage="usage: %prog [options] interface")
+parser.add_option("--add-version", help="add a new implementation", action='store', metavar='VERSION')
 parser.add_option("--archive-url", help="add archive at this URL", action='store', metavar='URL')
 parser.add_option("--archive-file", help="local copy of archive-url", action='store', metavar='FILE')
 parser.add_option("--archive-extract", help="subdirectory of archive to extract", action='store', metavar='DIR')
@@ -118,6 +119,9 @@ if options.gpgsign:
 if options.key:
 	print "Changing key from '%s' to '%s'" % (key, options.key)
 	key = options.key
+if options.add_version:
+	import release
+	data = release.add_version(data, options.add_version)
 if options.set_id or options.set_version or options.set_released or \
    options.set_stability or options.set_arch or options.set_main:
 	import release

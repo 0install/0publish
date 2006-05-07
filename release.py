@@ -1,8 +1,27 @@
-from xml.dom import minidom
+from xml.dom import minidom, Node
 from zeroinstall.injector import namespaces, model
 import time, re
 
 date_format = '\d{4}-\d{2}-\d{2}'
+
+def add_version(data, version):
+	"""Create a new <implementation> after the last one in the file."""
+	doc = minidom.parseString(data)
+	all_impls = doc.documentElement.getElementsByTagNameNS(namespaces.XMLNS_IFACE, 'implementation')
+	if not all_impls:
+		raise Exception('No existing <implementation> elements found!')
+	new_impl = doc.createElementNS(namespaces.XMLNS_IFACE, 'implementation')
+	new_impl.setAttribute('version', version)
+	new_impl.setAttribute('id', '.')
+
+	last_impl = all_impls[-1]
+	previous = last_impl.previousSibling
+	next = last_impl.nextSibling
+	parent = last_impl.parentNode
+	if previous and previous.nodeType == Node.TEXT_NODE:
+		parent.insertBefore(doc.createTextNode(previous.nodeValue), next)
+	parent.insertBefore(new_impl, next)
+	return doc.toxml()
 
 def make_release(data, id, version, released, stability, main, arch):
 	"""Normally there's only one implementation, but we can cope with several."""
