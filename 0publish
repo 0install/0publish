@@ -26,6 +26,7 @@ parser.add_option("--set-stability", help="set stability", action='store', metav
 parser.add_option("--set-version", help="set version number", action='store', metavar='VERSION')
 parser.add_option("-s", "--stable", help="mark testing version stable", action='store_true')
 parser.add_option("-x", "--xmlsign", help="add an XML signature block", action='store_true')
+parser.add_option("-u", "--unsign", help="remove any signature", action='store_true')
 parser.add_option("-v", "--verbose", help="more verbose output", action='count')
 parser.add_option("-V", "--version", help="display version information", action='store_true')
 
@@ -114,6 +115,8 @@ while True:
 # Process it...
 if options.xmlsign:
 	sign_fn = signing.sign_xml
+if options.unsign:
+	sign_fn = signing.sign_unsigned
 if options.gpgsign:
 	sign_fn = signing.sign_plain
 if options.key:
