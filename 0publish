@@ -18,6 +18,7 @@ parser.add_option("-g", "--gpgsign", help="add a GPG signature block", action='s
 parser.add_option("-k", "--key", help="key to use for signing")
 parser.add_option("-l", "--local", help="create feed from local interface")
 parser.add_option("--manifest-algorithm", help="select algorithm for manifests", action='store', metavar='ALG')
+parser.add_option("--set-interface-uri", help="set interface URI", action='store', metavar='URI')
 parser.add_option("--set-id", help="set implementation ID", action='store', metavar='DIGEST')
 parser.add_option("--set-main", help="set main executable", action='store', metavar='EXEC')
 parser.add_option("--set-arch", help="set architecture", action='store', metavar='ARCH')
@@ -122,6 +123,9 @@ if options.gpgsign:
 if options.key:
 	print "Changing key from '%s' to '%s'" % (key, options.key)
 	key = options.key
+if options.set_interface_uri:
+	import release
+	data = release.set_interface_uri(data, options.set_interface_uri)
 if options.add_version:
 	import release
 	data = release.add_version(data, options.add_version)

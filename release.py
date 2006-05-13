@@ -4,6 +4,12 @@ import time, re
 
 date_format = '\d{4}-\d{2}-\d{2}'
 
+def set_interface_uri(data, uri):
+	"""Set the uri attribute on the root element."""
+	doc = minidom.parseString(data)
+	doc.documentElement.setAttribute('uri', uri)
+	return doc.toxml()
+
 def add_version(data, version):
 	"""Create a new <implementation> after the last one in the file."""
 	doc = minidom.parseString(data)
