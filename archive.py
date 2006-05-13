@@ -1,10 +1,25 @@
 from xml.dom import minidom
-from zeroinstall.zerostore import Store, manifest, unpack
+from zeroinstall.zerostore import Store, manifest
+try:
+	from zeroinstall.zerostore import unpack
+except ImportError:
+	# Older versions don't have it
+	import unpack
 from zeroinstall.injector import namespaces
-import os, time, re, shutil, tempfile, sha
+import os, time, re, shutil, tempfile
 
 def manifest_for_dir(dir, alg):
-	algorithm = manifest.get_algorithm(alg)
+	if alg == 'sha1':
+		# (for older versions of the injector)
+		import sha
+		class SHA1:
+			def new_digest(self): return sha.new()
+			def generate_manifest(self, dir): return manifest.generate_manifest(dir)
+			def getID(self, digest): return 'sha1=' + digest.hexdigest()
+		algorithm = SHA1()
+	else:
+		algorithm = manifest.get_algorithm(alg)
+
 	digest = algorithm.new_digest()
 	for line in algorithm.generate_manifest(dir):
 		digest.update(line + '\n')
