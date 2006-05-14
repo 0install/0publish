@@ -1,5 +1,5 @@
 from zeroinstall.injector import gpg
-import tempfile, os, base64, sys
+import tempfile, os, base64, sys, shutil
 
 def check_signature(path):
 	data = file(path).read()
@@ -64,3 +64,27 @@ def sign_xml(path, data, key):
 	os.unlink(tmp)
 	sig = "<!-- Base64 Signature\n" + encoded + "\n-->\n"
 	os.rename(write_tmp(path, data + sig), path)
+
+def export_key(dir, fingerprint):
+	assert fingerprint is not None
+	# Convert fingerprint to key ID
+	stream = os.popen('gpg --with-colons --list-keys %s' % fingerprint)
+	try:
+		keyID = None
+		for line in stream:
+			parts = line.split(':')
+			if parts[0] == 'pub':
+				if keyID:
+					raise Exception('Two key IDs returned from GPG!')
+				keyID = parts[4]
+	finally:
+		stream.close()
+	key_file = os.path.join(dir, keyID + '.gpg')
+	if os.path.isfile(key_file):
+		return
+	key_stream = file(key_file, 'w')
+	stream = os.popen("gpg -a --export '%s'" % fingerprint)
+	shutil.copyfileobj(stream, key_stream)
+	stream.close()
+	key_stream.close()
+	print "Exported public key as '%s'" % key_file

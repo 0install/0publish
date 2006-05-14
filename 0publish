@@ -174,3 +174,12 @@ if not data.endswith('\n'): data += '\n'
 sign_fn(interface, data, key)
 
 info("Wrote '%S'", interface)
+
+if sign_fn != signing.sign_unsigned:
+	# Read it back in to find out what key we signed it with
+	# and ensure that the key has been exported
+	contents = file(interface).read()
+	saved_data, saved_sign_fn, saved_key = signing.check_signature(interface)
+	assert saved_data == data
+	assert saved_sign_fn == sign_fn
+	signing.export_key(os.path.dirname(interface), saved_key)
