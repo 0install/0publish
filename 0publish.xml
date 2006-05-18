@@ -22,6 +22,6 @@
   <feed-for interface='http://0install.net/2006/interfaces/0publish'/>
 
   <group main='0publish'>
-    <implementation id="." version="0.4" released='Snapshot'/>
+    <implementation id="." version="0.5" released='Snapshot'/>
   </group>
 </interface>
