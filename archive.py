@@ -35,8 +35,8 @@ def add_archive(data, url, local_file, extract, alg):
 	doc = minidom.parseString(data)
 
 	if alg is None:
-		if local_file.endswith('.deb'):
-			# Debs require 0launch >= 0.20 anyway, so use the new hash to avoid
+		if local_file.endswith('.deb') or local_file.endswith('.zip'):
+			# Debs and Zips require 0launch >= 0.20 anyway, so use the new hash to avoid
 			# problems with directory mtimes
 			alg = 'sha1new'
 		else:
