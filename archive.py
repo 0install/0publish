@@ -25,6 +25,12 @@ def manifest_for_dir(dir, alg):
 		digest.update(line + '\n')
 	return algorithm.getID(digest)
 
+def autopackage_get_start_offset(package):
+	for line in file(package):
+		if line.startswith('export dataSize='):
+			return os.path.getsize(package) - int(line.split('"', 2)[1])
+	raise Exception("Can't find payload in autopackage (missing 'dataSize')")
+
 def add_archive(data, url, local_file, extract, alg):
 	if local_file is None:
 		local_file = os.path.abspath(os.path.basename(url))
@@ -35,17 +41,28 @@ def add_archive(data, url, local_file, extract, alg):
 	doc = minidom.parseString(data)
 
 	if alg is None:
-		if local_file.endswith('.deb') or local_file.endswith('.zip'):
-			# Debs and Zips require 0launch >= 0.20 anyway, so use the new hash to avoid
+		if local_file.endswith('.deb') or local_file.endswith('.zip') or \
+		   local_file.endswith('.package'):
+			# These require 0launch >= 0.20 anyway, so use the new hash to avoid
 			# problems with directory mtimes
 			alg = 'sha1new'
 		else:
 			alg = 'sha1'
+	
+	if local_file.endswith('.package'):
+		start_offset = autopackage_get_start_offset(local_file)
+		type = 'application/x-bzip-compressed-tar'
+	else:
+		start_offset = 0
+		type = None
 
 	all_impls = doc.documentElement.getElementsByTagNameNS(namespaces.XMLNS_IFACE, 'implementation')
 	tmpdir = tempfile.mkdtemp('-0publish')
 	try:
-		unpack.unpack_archive(url, file(local_file), tmpdir, extract)
+		if start_offset or type:
+			unpack.unpack_archive(url, file(local_file), tmpdir, extract, start_offset = start_offset, type = type)
+		else:
+			unpack.unpack_archive(url, file(local_file), tmpdir, extract)
 		if extract:
 			extracted = os.path.join(tmpdir, extract)
 		else:
@@ -78,9 +95,13 @@ def add_archive(data, url, local_file, extract, alg):
 	archive = doc.createElementNS(namespaces.XMLNS_IFACE, 'archive')
 	impl.appendChild(archive)
 	archive.setAttribute('href', url)
-	archive.setAttribute('size', str(os.stat(local_file).st_size))
+	archive.setAttribute('size', str(os.stat(local_file).st_size - start_offset))
 	if extract is not None:
 		archive.setAttribute('extract', extract)
+	if start_offset:
+		archive.setAttribute('start-offset', str(start_offset))
+	if type:
+		archive.setAttribute('type', type)
 
 	nl = doc.createTextNode('\n    ')
 	impl.appendChild(nl)
