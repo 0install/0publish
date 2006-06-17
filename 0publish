@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 from zeroinstall.injector import gpg
+from zeroinstall import SafeException
 from optparse import OptionParser
 import os, sys
 import signing
@@ -64,122 +65,127 @@ def confirm(q):
 		if ans in ('y', 'yes'): return True
 		if ans in ('n', 'no'): return False
 
-# Load or create the starting data...
+try:
+	# Load or create the starting data...
 
-if os.path.exists(interface):
-	contents = file(interface).read()
-	data, sign_fn, key = signing.check_signature(interface)
-elif options.local:
-	import create
-	if os.path.exists(options.local):
-		data = create.create_from_local(options.local)
-		sign_fn = signing.sign_unsigned
-		key = None
-		force_save = True
-		options.local = False
+	if os.path.exists(interface):
+		contents = file(interface).read()
+		data, sign_fn, key = signing.check_signature(interface)
+	elif options.local:
+		import create
+		if os.path.exists(options.local):
+			data = create.create_from_local(options.local)
+			sign_fn = signing.sign_unsigned
+			key = None
+			force_save = True
+			options.local = False
+		else:
+			raise Exception("File '%s' does not exist." % options.local)
 	else:
-		raise Exception("File '%s' does not exist." % options.local)
-else:
-	if confirm("Interface file '%s' does not exist. Create it?" % interface):
-		from create import create
-		data = create(interface)
+		if confirm("Interface file '%s' does not exist. Create it?" % interface):
+			from create import create
+			data = create(interface)
+			sign_fn = signing.sign_unsigned
+			key = None
+			options.edit = True
+		else:
+			sys.exit(1)
+
+	debug("Original data: %s", data)
+	info("Original signing method: %s", sign_fn.__name__)
+	info("Original key: %s", key)
+
+	old_data = data
+	old_sign_fn = sign_fn
+	old_key = key
+
+	while True:
+		# Validate the input...
+		try:
+			validator.check(data)
+			break
+		except validator.InvalidInterface, ex:
+			print "Invalid interface: " + str(ex)
+
+		while True:
+			ans = raw_input("Interface is invalid. (E)dit or (A)bort?").lower()
+			if ans in ('e', 'edit'):
+				data = edit.edit(data)
+				options.edit = False	# Don't edit twice
+				break
+			if ans in ('a', 'abort'): sys.exit(1)
+
+	# Process it...
+	if options.xmlsign:
+		sign_fn = signing.sign_xml
+	if options.unsign:
 		sign_fn = signing.sign_unsigned
-		key = None
-		options.edit = True
-	else:
+	if options.gpgsign:
+		sign_fn = signing.sign_plain
+	if options.key:
+		print "Changing key from '%s' to '%s'" % (key, options.key)
+		key = options.key
+	if options.set_interface_uri:
+		import release
+		data = release.set_interface_uri(data, options.set_interface_uri)
+	if options.add_version:
+		import release
+		data = release.add_version(data, options.add_version)
+	if options.set_id or options.set_version or options.set_released or \
+	   options.set_stability or options.set_arch or options.set_main:
+		import release
+		data = release.make_release(data, options.set_id,
+			options.set_version, options.set_released, options.set_stability,
+			options.set_main, options.set_arch)
+	if options.stable:
+		import stable
+		data = stable.mark_stable(data)
+	if options.archive_url:
+		import archive
+		data = archive.add_archive(data, options.archive_url, options.archive_file, options.archive_extract, options.manifest_algorithm)
+	elif options.archive_file or options.archive_extract:
+		raise Exception('Must use --archive-uri option')
+	if options.local:
+		import merge
+		data = merge.merge(data, options.local)
+	if options.edit:
+		data = edit.edit(data)
+
+	while True:
+		# Validate the result...
+		try:
+			validator.check(data)
+			break
+		except validator.InvalidInterface, ex:
+			print "Invalid interface: " + str(ex)
+
+		while True:
+			ans = raw_input("Interface is invalid. (E)dit or (A)bort?").lower()
+			if ans in ('e', 'edit'):
+				data = edit.edit(data)
+				break
+			if ans in ('a', 'abort'): sys.exit(1)
+
+
+	if (old_data == data and sign_fn == old_sign_fn and key == old_key) and not force_save:
+		print "Interface unchanged. Not writing."
 		sys.exit(1)
 
-debug("Original data: %s", data)
-info("Original signing method: %s", sign_fn.__name__)
-info("Original key: %s", key)
+	# Write it back out
+	if not data.endswith('\n'): data += '\n'
+	sign_fn(interface, data, key)
 
-old_data = data
-old_sign_fn = sign_fn
-old_key = key
+	info("Wrote '%S'", interface)
 
-while True:
-	# Validate the input...
-	try:
-		validator.check(data)
-		break
-	except validator.InvalidInterface, ex:
-		print "Invalid interface: " + str(ex)
-
-	while True:
-		ans = raw_input("Interface is invalid. (E)dit or (A)bort?").lower()
-		if ans in ('e', 'edit'):
-			data = edit.edit(data)
-			options.edit = False	# Don't edit twice
-			break
-		if ans in ('a', 'abort'): sys.exit(1)
-
-# Process it...
-if options.xmlsign:
-	sign_fn = signing.sign_xml
-if options.unsign:
-	sign_fn = signing.sign_unsigned
-if options.gpgsign:
-	sign_fn = signing.sign_plain
-if options.key:
-	print "Changing key from '%s' to '%s'" % (key, options.key)
-	key = options.key
-if options.set_interface_uri:
-	import release
-	data = release.set_interface_uri(data, options.set_interface_uri)
-if options.add_version:
-	import release
-	data = release.add_version(data, options.add_version)
-if options.set_id or options.set_version or options.set_released or \
-   options.set_stability or options.set_arch or options.set_main:
-	import release
-	data = release.make_release(data, options.set_id,
-		options.set_version, options.set_released, options.set_stability,
-		options.set_main, options.set_arch)
-if options.stable:
-	import stable
-	data = stable.mark_stable(data)
-if options.archive_url:
-	import archive
-	data = archive.add_archive(data, options.archive_url, options.archive_file, options.archive_extract, options.manifest_algorithm)
-elif options.archive_file or options.archive_extract:
-	raise Exception('Must use --archive-uri option')
-if options.local:
-	import merge
-	data = merge.merge(data, options.local)
-if options.edit:
-	data = edit.edit(data)
-
-while True:
-	# Validate the result...
-	try:
-		validator.check(data)
-		break
-	except validator.InvalidInterface, ex:
-		print "Invalid interface: " + str(ex)
-
-	while True:
-		ans = raw_input("Interface is invalid. (E)dit or (A)bort?").lower()
-		if ans in ('e', 'edit'):
-			data = edit.edit(data)
-			break
-		if ans in ('a', 'abort'): sys.exit(1)
-
-
-if (old_data == data and sign_fn == old_sign_fn and key == old_key) and not force_save:
-	print "Interface unchanged. Not writing."
+	if sign_fn != signing.sign_unsigned:
+		# Read it back in to find out what key we signed it with
+		# and ensure that the key has been exported
+		contents = file(interface).read()
+		saved_data, saved_sign_fn, saved_key = signing.check_signature(interface)
+		assert saved_data == data
+		assert saved_sign_fn == sign_fn
+		signing.export_key(os.path.dirname(interface), saved_key)
+except SafeException, ex:
+	if options.verbose: raise
+	print >>sys.stderr, ex
 	sys.exit(1)
-
-# Write it back out
-if not data.endswith('\n'): data += '\n'
-sign_fn(interface, data, key)
-
-info("Wrote '%S'", interface)
-
-if sign_fn != signing.sign_unsigned:
-	# Read it back in to find out what key we signed it with
-	# and ensure that the key has been exported
-	contents = file(interface).read()
-	saved_data, saved_sign_fn, saved_key = signing.check_signature(interface)
-	assert saved_data == data
-	assert saved_sign_fn == sign_fn
-	signing.export_key(os.path.dirname(interface), saved_key)
