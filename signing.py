@@ -1,3 +1,4 @@
+from zeroinstall import SafeException
 from zeroinstall.injector import gpg
 import tempfile, os, base64, sys, shutil
 
@@ -40,7 +41,7 @@ def run_gpg(default_key, *arguments):
 		arguments = ['--default-key', default_key] + arguments
 	arguments.insert(0, 'gpg')
 	if os.spawnvp(os.P_WAIT, 'gpg', arguments):
-		raise Exception("Command '%s' failed" % arguments)
+		raise SafeException("Command '%s' failed" % arguments)
 
 def sign_unsigned(path, data, key):
 	os.rename(write_tmp(path, data), path)
