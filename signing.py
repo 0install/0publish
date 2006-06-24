@@ -24,6 +24,8 @@ def check_signature(path):
 		print "Got:", sig
 	ok = raw_input('Ignore and load anyway? (y/N) ').lower()
 	if ok and 'yes'.startswith(ok):
+		import __main__
+		__main__.force_save = True
 		return data, sign_unsigned, None
 	sys.exit(1)
 
