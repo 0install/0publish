@@ -1,4 +1,5 @@
 from xml.dom import minidom
+from zeroinstall import SafeException
 from zeroinstall.zerostore import Store, manifest
 try:
 	from zeroinstall.zerostore import unpack
@@ -35,7 +36,7 @@ def add_archive(data, url, local_file, extract, alg):
 	if local_file is None:
 		local_file = os.path.abspath(os.path.basename(url))
 		if not os.path.exists(local_file):
-			raise Exception("Use --archive-file option to specify a local copy of the archive "
+			raise SafeException("Use --archive-file option to specify a local copy of the archive "
 					"(default file '%s' does not exist)" % local_file)
 
 	doc = minidom.parseString(data)
