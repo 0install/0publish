@@ -101,7 +101,7 @@ try:
 	while True:
 		# Validate the input...
 		try:
-			validator.check(data)
+			validator.check(data, warnings = False)	# Don't warn on load AND save!
 			break
 		except validator.InvalidInterface, ex:
 			print "Invalid interface: " + str(ex)
@@ -177,7 +177,7 @@ try:
 	if not data.endswith('\n'): data += '\n'
 	sign_fn(interface, data, key)
 
-	info("Wrote '%S'", interface)
+	info("Wrote '%s'", interface)
 
 	if sign_fn != signing.sign_unsigned:
 		# Read it back in to find out what key we signed it with
