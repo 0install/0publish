@@ -3,7 +3,9 @@ from xml.dom import minidom, XMLNS_NAMESPACE, Node
 from zeroinstall.injector.namespaces import XMLNS_IFACE
 from zeroinstall.injector import model, reader
 
-_local_template_start = """<?xml version="1.0" ?>
+# minidom loses the newline after the stylesheet declaration, so we
+# just serialise the body and glue this on the front manually...
+xml_header = """<?xml version="1.0" ?>
 <?xml-stylesheet type='text/xsl'
      href='http://0install.net/2006/stylesheets/interface.xsl'?>
 """
@@ -94,4 +96,4 @@ def create_from_local(local):
 	root.appendChild(doc.createTextNode('\n'))
 
 	# minidom's writer loses the newline after the PI
-	return _local_template_start + root.toxml()
+	return xml_header + root.toxml()

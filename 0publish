@@ -1,11 +1,12 @@
 #!/usr/bin/env python
 from zeroinstall.injector import gpg
 from zeroinstall import SafeException
+from xml.dom import minidom
 from optparse import OptionParser
 import os, sys
 import signing
 from logging import info, debug
-import edit, validator
+import edit, validator, create
 
 version = '0.6'
 
@@ -72,7 +73,6 @@ try:
 		contents = file(interface).read()
 		data, sign_fn, key = signing.check_signature(interface)
 	elif options.local:
-		import create
 		if os.path.exists(options.local):
 			data = create.create_from_local(options.local)
 			sign_fn = signing.sign_unsigned
@@ -83,8 +83,7 @@ try:
 			raise Exception("File '%s' does not exist." % options.local)
 	else:
 		if confirm("Interface file '%s' does not exist. Create it?" % interface):
-			from create import create
-			data = create(interface)
+			data = create.create(interface)
 			sign_fn = signing.sign_unsigned
 			key = None
 			options.edit = True
@@ -166,6 +165,9 @@ try:
 				break
 			if ans in ('a', 'abort'): sys.exit(1)
 
+	# Tidy up the XML
+	doc = minidom.parseString(data)
+	data = create.xml_header + doc.documentElement.toxml()
 
 	if (old_data == data and sign_fn == old_sign_fn and key == old_key) and not force_save:
 		print "Interface unchanged. Not writing."
