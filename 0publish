@@ -165,13 +165,13 @@ try:
 				break
 			if ans in ('a', 'abort'): sys.exit(1)
 
-	# Tidy up the XML
-	doc = minidom.parseString(data)
-	data = create.xml_header + doc.documentElement.toxml()
-
 	if (old_data == data and sign_fn == old_sign_fn and key == old_key) and not force_save:
 		print "Interface unchanged. Not writing."
 		sys.exit(1)
+
+	# Tidy up the XML
+	doc = minidom.parseString(data)
+	data = create.xml_header + doc.documentElement.toxml()
 
 	# Write it back out
 	if not data.endswith('\n'): data += '\n'

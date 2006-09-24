@@ -6,7 +6,7 @@ import tempfile
 from logging import warn, info, debug
 
 known_elements = {
-	'interface' : ['uri', 'min-injector-version'],
+	'interface' : ['uri', 'min-injector-version', 'main'],	# (main is deprecated)
 	'name' : [],
 	'summary' : [],
 	'description' : [],
