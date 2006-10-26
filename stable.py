@@ -1,5 +1,6 @@
 from xml.dom import minidom
 from zeroinstall.injector import namespaces, model
+from logging import warn
 
 def mark_stable(data):
 	"""Find the single release marked as 'testing' and make it 'stable'."""
@@ -11,10 +12,11 @@ def mark_stable(data):
 			testing.append(x)
 	if len(testing) == 0:
 		raise Exception('No implementations are currently "testing"!')
+	impl = testing[-1]
 	if len(testing) > 1:
-		raise Exception("Multiple 'testing' implementations!")
+		warn("Multiple 'testing' implementations - changing last one (%s)", impl.getAttribute('version'))
 	
-	testing[0].setAttribute('stability', 'stable')
+	impl.setAttribute('stability', 'stable')
 	
 	return doc.toxml()
 
