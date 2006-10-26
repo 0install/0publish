@@ -5,9 +5,10 @@ from zeroinstall.injector import model, reader
 
 # minidom loses the newline after the stylesheet declaration, so we
 # just serialise the body and glue this on the front manually...
+# Firefox doesn't support cross-site links to style-sheets, so use a
+# relative link instead.
 xml_header = """<?xml version="1.0" ?>
-<?xml-stylesheet type='text/xsl'
-     href='http://0install.net/2006/stylesheets/interface.xsl'?>
+<?xml-stylesheet type='text/xsl' href='interface.xsl'?>
 """
 
 _template = """<?xml version="1.0" ?>
