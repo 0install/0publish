@@ -16,7 +16,7 @@ known_elements = {
 	'feed-for' : ['interface'],
 
 	'group' : ['version', 'released', 'main', 'stability', 'arch'],
-	'implementation' : ['id', 'version', 'released', 'main', 'stability', 'arch'],
+	'implementation' : ['id', 'version', 'released', 'main', 'stability', 'arch', 'version-modifier'],
 	'archive' : ['href', 'size', 'extract', 'type', 'start-offset'],
 	'recipe' : [],
 	'requires' : ['interface'],
