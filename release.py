@@ -60,6 +60,7 @@ def make_release(data, id, version, released, stability, main, arch):
 		if arch is not None: x.setAttribute('arch', arch)
 		if version is not None:
 			x.setAttribute('version', version)
+		if x.hasAttribute('version-modifier'):
 			x.removeAttribute('version-modifier')
 	
 	return doc.toxml()
