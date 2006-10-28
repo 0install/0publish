@@ -8,7 +8,7 @@ import signing
 from logging import info, debug
 import edit, validator, create
 
-version = '0.8'
+version = '0.9'
 
 parser = OptionParser(usage="usage: %prog [options] interface")
 parser.add_option("--add-version", help="add a new implementation", action='store', metavar='VERSION')
