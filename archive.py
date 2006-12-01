@@ -28,7 +28,7 @@ def manifest_for_dir(dir, alg):
 
 def autopackage_get_start_offset(package):
 	for line in file(package):
-		if line.startswith('export dataSize='):
+		if line.startswith('export dataSize=') or line.startswith('export data_size='):
 			return os.path.getsize(package) - int(line.split('"', 2)[1])
 	raise Exception("Can't find payload in autopackage (missing 'dataSize')")
 
