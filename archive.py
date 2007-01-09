@@ -42,13 +42,7 @@ def add_archive(data, url, local_file, extract, alg):
 	doc = minidom.parseString(data)
 
 	if alg is None:
-		if local_file.endswith('.deb') or local_file.endswith('.zip') or \
-		   local_file.endswith('.package'):
-			# These require 0launch >= 0.20 anyway, so use the new hash to avoid
-			# problems with directory mtimes
-			alg = 'sha1new'
-		else:
-			alg = 'sha1'
+		alg = 'sha1new'
 	
 	if local_file.endswith('.package'):
 		start_offset = autopackage_get_start_offset(local_file)
