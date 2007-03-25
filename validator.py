@@ -11,6 +11,7 @@ known_elements = {
 	'summary' : [],
 	'description' : [],
 	'homepage' : [],
+	'category' : ['type'],
 	'icon' : ['type', 'href'],
 	'feed' : ['src', 'arch'],
 	'feed-for' : ['interface'],
