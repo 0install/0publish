@@ -58,13 +58,13 @@ def sign_plain(path, data, key):
 
 def sign_xml(path, data, key):
 	tmp = write_tmp(path, data)
+	sigtmp = tmp + '.sig'
 	try:
-		run_gpg(key, '--detach-sign', tmp)
+		run_gpg(key, '--detach-sign', '--output', sigtmp, tmp)
 	finally:
 		os.unlink(tmp)
-	tmp += '.sig'
-	encoded = base64.encodestring(file(tmp).read())
-	os.unlink(tmp)
+	encoded = base64.encodestring(file(sigtmp).read())
+	os.unlink(sigtmp)
 	sig = "<!-- Base64 Signature\n" + encoded + "\n-->\n"
 	os.rename(write_tmp(path, data + sig), path)
 
