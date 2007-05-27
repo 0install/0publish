@@ -12,7 +12,7 @@ def available_in_path(command):
 	return False
 
 def edit(data):
-	fd, tmp = tempfile.mkstemp(prefix = '0publish-')
+	fd, tmp = tempfile.mkstemp(prefix = '0publish-', suffix = '.xml')
 	try:
 		stream = os.fdopen(fd, 'w')
 		stream.write(data)

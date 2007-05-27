@@ -15,6 +15,7 @@ parser.add_option("--add-version", help="add a new implementation", action='stor
 parser.add_option("--archive-url", help="add archive at this URL", action='store', metavar='URL')
 parser.add_option("--archive-file", help="local copy of archive-url", action='store', metavar='FILE')
 parser.add_option("--archive-extract", help="subdirectory of archive to extract", action='store', metavar='DIR')
+parser.add_option("-c", "--create", help="create file if nonexistant", action='store_true')
 parser.add_option("-e", "--edit", help="edit with $EDITOR", action='store_true')
 parser.add_option("-g", "--gpgsign", help="add a GPG signature block", action='store_true')
 parser.add_option("-k", "--key", help="key to use for signing")
@@ -35,7 +36,7 @@ parser.add_option("-V", "--version", help="display version information", action=
 
 (options, args) = parser.parse_args()
 
-force_save = False
+force_save = options.create
 
 if options.version:
 	print "0publish (zero-install) " + version
@@ -82,11 +83,11 @@ try:
 		else:
 			raise Exception("File '%s' does not exist." % options.local)
 	else:
-		if confirm("Interface file '%s' does not exist. Create it?" % interface):
+		if options.create or confirm("Interface file '%s' does not exist. Create it?" % interface):
 			data = create.create(interface)
 			sign_fn = signing.sign_unsigned
 			key = None
-			options.edit = True
+			options.edit = not options.create
 		else:
 			sys.exit(1)
 
