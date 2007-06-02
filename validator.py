@@ -16,13 +16,13 @@ known_elements = {
 	'feed' : ['src', 'arch'],
 	'feed-for' : ['interface'],
 
-	'group' : ['version', 'released', 'main', 'stability', 'arch', 'license'],
+	'group' : ['version', 'released', 'main', 'stability', 'arch', 'license', 'doc-dir'],
 	'implementation' : ['id', 'version', 'released', 'main', 'stability', 'arch', 'version-modifier', 'license'],
 	'archive' : ['href', 'size', 'extract', 'type', 'start-offset'],
 	'recipe' : [],
 	'requires' : ['interface'],
 	'version' : ['not-before', 'before'],
-	'environment' : ['name', 'insert', 'default'],
+	'environment' : ['name', 'insert', 'default', 'mode'],
 }
 
 def checkElement(elem):
