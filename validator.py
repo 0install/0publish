@@ -10,6 +10,7 @@ known_elements = {
 	'name' : [],
 	'summary' : [],
 	'description' : [],
+	'needs-terminal' : [],
 	'homepage' : [],
 	'category' : ['type'],
 	'icon' : ['type', 'href'],
