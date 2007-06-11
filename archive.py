@@ -9,6 +9,15 @@ except ImportError:
 from zeroinstall.injector import namespaces
 import os, time, re, shutil, tempfile
 
+def ro_rmtree(root):
+	"""Like shutil.rmtree, except that we also delete with read-only items.
+	@param root: the root of the subtree to remove
+	@type root: str
+	@since: 0.28"""
+	for main, dirs, files in os.walk(root):
+		os.chmod(main, 0700)
+	shutil.rmtree(root)
+
 def manifest_for_dir(dir, alg):
 	if alg == 'sha1':
 		# (for older versions of the injector)
@@ -65,7 +74,7 @@ def add_archive(data, url, local_file, extract, alg):
 
 		archive_id = manifest_for_dir(extracted, alg)
 	finally:
-		shutil.rmtree(tmpdir)
+		ro_rmtree(tmpdir)
 
 	local_ifaces = []
 	for impl in all_impls:
