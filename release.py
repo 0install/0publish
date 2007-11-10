@@ -54,7 +54,11 @@ def make_release(data, id, version, released, stability, main, arch):
 	# In future, we may want to bulk change implementations...
 	for x in [unreleased]:
 		if id is not None: x.setAttribute('id', id)
-		if released is not None: x.setAttribute('released', released)
+		if released is not None:
+			if released:
+				x.setAttribute('released', released)
+			else:
+				x.removeAttribute('released')
 		if stability is not None: x.setAttribute('stability', stability)
 		if main is not None: x.setAttribute('main', main)
 		if arch is not None: x.setAttribute('arch', arch)
