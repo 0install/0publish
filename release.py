@@ -57,7 +57,7 @@ def make_release(data, id, version, released, stability, main, arch):
 		if released is not None:
 			if released:
 				x.setAttribute('released', released)
-			else:
+			elif x.hasAttribute('released'):
 				x.removeAttribute('released')
 		if stability is not None: x.setAttribute('stability', stability)
 		if main is not None: x.setAttribute('main', main)
