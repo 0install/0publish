@@ -31,7 +31,9 @@ def check_signature(path):
 
 def write_tmp(path, data):
 	"""Create a temporary file in the same directory as 'path' and write data to it."""
-	fd, tmp = tempfile.mkstemp(prefix = 'tmp-', dir = os.path.dirname(path))
+	tmpdir = os.path.dirname(path)
+	assert os.path.isdir(tmpdir), "Not a directory: " + tmpdir
+	fd, tmp = tempfile.mkstemp(prefix = 'tmp-', dir = tmpdir)
 	stream = os.fdopen(fd, 'w')
 	stream.write(data)
 	stream.close()
