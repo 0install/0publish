@@ -32,11 +32,17 @@ def check_signature(path):
 def write_tmp(path, data):
 	"""Create a temporary file in the same directory as 'path' and write data to it."""
 	tmpdir = os.path.dirname(path)
-	assert os.path.isdir(tmpdir), "Not a directory: " + tmpdir
+	if tmpdir:
+		assert os.path.isdir(tmpdir), "Not a directory: " + tmpdir
 	fd, tmp = tempfile.mkstemp(prefix = 'tmp-', dir = tmpdir)
 	stream = os.fdopen(fd, 'w')
 	stream.write(data)
 	stream.close()
+
+	umask = os.umask(0)
+	os.umask(umask)
+	os.chmod(tmp, 0644 & ~umask)
+
 	return tmp
 
 def run_gpg(default_key, *arguments):
