@@ -3,6 +3,7 @@ from xml.dom import minidom, XMLNS_NAMESPACE, Node
 from zeroinstall.injector.namespaces import XMLNS_IFACE
 from zeroinstall.injector import model, reader
 from logging import info
+import xmltools
 
 def childNodes(parent, namespaceURI, localName = None):
 	for x in parent.childNodes:
@@ -87,8 +88,7 @@ def merge(data, local):
 
 		# If we have additional requirements, we'll need to create a subgroup and add them
 		if len(new_impl_context.requires) > len(group_context.requires):
-			subgroup = master_doc.createElementNS(XMLNS_IFACE, 'group')
-			group.appendChild(subgroup)
+			subgroup = xmltools.create_element(group, 'group')
 			group = subgroup
 			group_context = Context(group)
 			for x in new_impl_context.requires:
@@ -97,7 +97,7 @@ def merge(data, local):
 				else:
 					req = master_doc.importNode(x, True)
 					#print "Add", req
-					group.appendChild(req)
+					xmltools.insert_element(req, group)
 
 		new_impl = master_doc.importNode(impl, True)
 		for name, value in new_impl.attributes.itemsNS():
@@ -109,8 +109,6 @@ def merge(data, local):
 				#print "Set", name, value
 				new_impl.setAttributeNS(name[0], name[1], value)
 
-		group.appendChild(master_doc.createTextNode('  '))
-		group.appendChild(new_impl)
-		group.appendChild(master_doc.createTextNode('\n'))
+		xmltools.insert_element(new_impl, group)
 
 	return master_doc.toxml()
