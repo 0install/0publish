@@ -188,6 +188,9 @@ try:
 		assert saved_data == data
 		assert saved_sign_fn == sign_fn
 		signing.export_key(os.path.dirname(interface), saved_key)
+except KeyboardInterrupt, ex:
+	print >>sys.stderr, "Aborted at user's request"
+	sys.exit(1)
 except SafeException, ex:
 	if options.verbose: raise
 	print >>sys.stderr, ex
