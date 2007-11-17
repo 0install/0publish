@@ -78,7 +78,7 @@ def nodesEqual(a, b):
 	return True
 
 def score_subset(group, impl):
-	"""Returns (is_subset, badness)"""
+	"""Returns (is_subset, goodness)"""
 	for key in group.attribs:
 		if key not in impl.attribs.keys():
 			#print "BAD", key
