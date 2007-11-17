@@ -5,10 +5,10 @@ from zeroinstall.injector import model, reader
 from logging import info
 import xmltools
 
-def childNodes(parent, namespaceURI, localName = None):
+def childNodes(parent, namespaceURI = None, localName = None):
 	for x in parent.childNodes:
 		if x.nodeType != Node.ELEMENT_NODE: continue
-		if x.namespaceURI != namespaceURI: continue
+		if namespaceURI is not None and x.namespaceURI != namespaceURI: continue
 
 		if localName is None or x.localName == localName:
 			yield x
@@ -47,18 +47,49 @@ def find_groups(parent):
 		yield x
 		for y in find_groups(x):
 			yield y
+
+def nodesEqual(a, b):
+	assert a.nodeType == Node.ELEMENT_NODE
+	assert b.nodeType == Node.ELEMENT_NODE
+
+	if a.namespaceURI != b.namespaceURI:
+		return False
+
+	if a.nodeName != b.nodeName:
+		return False
 	
-def is_subset(group, impl):
+	a_attrs = set(["%s %s" % (name, value) for name, value in a.attributes.itemsNS()])
+	b_attrs = set(["%s %s" % (name, value) for name, value in b.attributes.itemsNS()])
+
+	if a_attrs != b_attrs:
+		#print "%s != %s" % (a_attrs, b_attrs)
+		return False
+	
+	a_children = list(childNodes(a))
+	b_children = list(childNodes(b))
+
+	if len(a_children) != len(b_children):
+		return False
+	
+	for a_child, b_child in zip(a_children, b_children):
+		if not nodesEqual(a_child, b_child):
+			return False
+	
+	return True
+
+def score_subset(group, impl):
+	"""Returns (is_subset, badness)"""
 	for key in group.attribs:
 		if key not in impl.attribs.keys():
-			print "BAD", key
-			return False		# Group sets an attribute the impl doesn't want
+			#print "BAD", key
+			return (0,)		# Group sets an attribute the impl doesn't want
 	for g_req in group.requires:
 		for i_req in impl.requires:
 			if nodesEqual(g_req, i_req): break
 		else:
-			return False		# Group adds a requires that the impl doesn't want
-	return True
+			return (0,)		# Group adds a requires that the impl doesn't want
+	# Score result so we get groups that have all the same requires first, then ones with all the same attribs
+	return (1, len(group.requires), len(group.attribs))
 
 def merge(data, local):
 	local_doc = minidom.parse(local)
@@ -76,12 +107,13 @@ def merge(data, local):
 		#    - A subset of the new implementation's attributes (names, not values)
 		#    Choose the most compatible <group> (the root counts as a minimally compatible group)
 
-		best_group = (0, master_doc.documentElement)
+		best_group = ((1, 0, 0), master_doc.documentElement)	# (score, element)
 
 		for group in find_groups(master_doc.documentElement):
 			group_context = Context(group)
-			if is_subset(group_context, new_impl_context):
-				best_group = (0, group)
+			score = score_subset(group_context, new_impl_context)
+			if score > best_group[0]:
+				best_group = (score, group)
 
 		group = best_group[1]
 		group_context = Context(group)
