@@ -1,7 +1,5 @@
 <?xml version="1.0" ?>
-<?xml-stylesheet type='text/xsl'
-     href='http://0install.net/2006/stylesheets/interface.xsl'?>
-
+<?xml-stylesheet type='text/xsl' href='interface.xsl'?>
 <interface xmlns="http://zero-install.sourceforge.net/2004/injector/interface">
   <name>0publish</name>
   <summary>utility to make creating injector interfaces easier</summary>
@@ -19,14 +17,14 @@
   </description>
   <homepage>http://0install.net/injector-packagers.html</homepage>
 
-  <release:management xmlns:release='http://zero-install.sourceforge.net/2007/namespaces/0release'>
+  <release:management xmlns:release="http://zero-install.sourceforge.net/2007/namespaces/0release">
     <!-- Update the copy of the version number in 0publish -->
-    <release:action phase='commit-release'>sed -i "s/^version = '.*'$/version = '$RELEASE_VERSION'/" 0publish</release:action>
+    <release:action phase="commit-release">sed -i &quot;s/^version = '.*'$/version = '$RELEASE_VERSION'/&quot; 0publish</release:action>
   </release:management>
 
-  <feed-for interface='http://0install.net/2006/interfaces/0publish'/>
+  <feed-for interface="http://0install.net/2006/interfaces/0publish"/>
 
-  <group main='0publish' self-test='tests/testall.py'>
-    <implementation id="." version="0.12" version-modifier='-post' released='Snapshot'/>
+  <group main="0publish" self-test="tests/testall.py">
+    <implementation id="." released="2007-11-17" version="0.13"/>
   </group>
 </interface>
