@@ -5,6 +5,8 @@ from xml.dom import minidom, Node, XMLNS_NAMESPACE
 import tempfile
 from logging import warn, info, debug
 
+group_impl_attribs = ['version', 'version-modifier', 'released', 'main', 'stability', 'arch', 'license', 'doc-dir', 'self-test']
+
 known_elements = {
 	'interface' : ['uri', 'min-injector-version', 'main'],	# (main is deprecated)
 	'name' : [],
@@ -17,8 +19,8 @@ known_elements = {
 	'feed' : ['src', 'arch'],
 	'feed-for' : ['interface'],
 
-	'group' : ['version', 'released', 'main', 'stability', 'arch', 'license', 'doc-dir'],
-	'implementation' : ['id', 'version', 'released', 'main', 'stability', 'arch', 'version-modifier', 'license', 'doc-dir'],
+	'group' : group_impl_attribs,
+	'implementation' : ['id'] + group_impl_attribs,
 	'package-implementation' : ['package'],
 
 	'archive' : ['href', 'size', 'extract', 'type', 'start-offset'],

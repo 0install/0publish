@@ -28,6 +28,8 @@ def check(xml, expectWarnings = ""):
 	my_log_stream = StringIO()
 	my_handler = logging.StreamHandler(my_log_stream)
 
+	root_logger.handlers = []
+
 	root_logger.addHandler(my_handler)
 	old_stderr = sys.stderr
 	try:

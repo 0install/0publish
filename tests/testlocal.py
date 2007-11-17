@@ -1,5 +1,5 @@
 #!/usr/bin/env python2.4
-import sys, logging, os, tempfile
+import sys, os, tempfile
 from zeroinstall.injector.namespaces import XMLNS_IFACE
 from zeroinstall.injector.reader import InvalidInterface
 from zeroinstall.injector import model, reader
@@ -43,7 +43,7 @@ def tap(s):
 	#print s
 	return s
 
-class TestValidator(unittest.TestCase):
+class TestLocal(unittest.TestCase):
 	def testCreate(self):
 		master = parse(create.create_from_local(local_file))
 		assert master.uri == 'http://test/hello.xml', master
@@ -151,7 +151,7 @@ class TestValidator(unittest.TestCase):
 		assert ctx.attribs[(None, 'x')] == '1'
 		assert ctx.attribs[('foo', 'z')] == '2'
 
-suite = unittest.makeSuite(TestValidator)
+suite = unittest.makeSuite(TestLocal)
 if __name__ == '__main__':
 	sys.argv.append('-v')
 	unittest.main()
