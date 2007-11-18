@@ -1,4 +1,4 @@
-from xml.dom import Node, minidom
+from xml.dom import Node, minidom, XMLNS_NAMESPACE
 
 XMLNS_INTERFACE = "http://zero-install.sourceforge.net/2004/injector/interface"
 XMLNS_COMPILE = "http://zero-install.sourceforge.net/2006/namespaces/0compile"
@@ -137,3 +137,39 @@ def set_or_remove(element, attr_name, value):
 		element.setAttribute(attr_name, value)
 	elif element.hasAttribute(attr_name):
 		element.removeAttribute(attr_name)
+
+namespace_prefixes = {}	# Namespace -> prefix
+
+def register_namespace(namespace, prefix = None):
+	"""Return the prefix to use for a namespace.
+	If none is registered, create a new one based on the suggested prefix.
+	@param namespace: namespace to register / query
+	@param prefix: suggested prefix
+	@return: the actual prefix
+	"""
+	existing_prefix = namespace_prefixes.get(namespace, None)
+	if existing_prefix:
+		return existing_prefix
+	
+	if not prefix:
+		prefix = 'ns'
+
+	# Find a variation on 'prefix' that isn't used yet, if necessary
+	orig_prefix = prefix
+	n = 0
+	while prefix in namespace_prefixes.values():
+		print "Prefix %s already in %s, not %s" % (prefix, namespace_prefixes, namespace)
+		n += 1
+		prefix = orig_prefix + str(n)
+	namespace_prefixes[namespace] = prefix
+
+	return prefix
+
+def add_attribute_ns(element, uri, name, value):
+	"""Set an attribute, giving it the correct prefix or namespace declarations needed."""
+	if not uri:
+		element.setAttributeNS(None, name, value)
+	else:
+		prefix = register_namespace(uri)
+		element.setAttributeNS(uri, '%s:%s' % (prefix, name), value)
+		element.ownerDocument.documentElement.setAttributeNS(XMLNS_NAMESPACE, 'xmlns:' + prefix, uri)

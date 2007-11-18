@@ -22,7 +22,9 @@ class Context:
 		node = impl
 		while True:
 			for name, value in node.attributes.itemsNS():
-				if name not in self.attribs:
+				if name[0] == XMLNS_NAMESPACE:
+					xmltools.register_namespace(value, name[1])
+				elif name not in self.attribs:
 					self.attribs[name] = value
 			if node.nodeName == 'group':
 				# We don't care about <requires> inside <implementation>; they'll get copied over anyway
@@ -91,6 +93,8 @@ def score_subset(group, impl):
 	# Score result so we get groups that have all the same requires first, then ones with all the same attribs
 	return (1, len(group.requires), len(group.attribs))
 
+# Note: the namespace stuff isn't quite right yet.
+# Might get conflicts if both documents use the same prefix for different things.
 def merge(data, local):
 	local_doc = minidom.parse(local)
 	master_doc = minidom.parseString(data)
@@ -136,10 +140,11 @@ def merge(data, local):
 		# Attributes might have been set on a parent group; move to the impl
 		for name in new_impl_context.attribs:
 			#print "Set", name, value
-			new_impl.setAttributeNS(name[0], name[1], new_impl_context.attribs[name])
+			xmltools.add_attribute_ns(new_impl, name[0], name[1], new_impl_context.attribs[name])
 
 		for name, value in new_impl.attributes.itemsNS():
-			if name in group_context.attribs and group_context.attribs[name] == value:
+			if name[0] == XMLNS_NAMESPACE or \
+			   (name in group_context.attribs and group_context.attribs[name] == value):
 				#print "Deleting duplicate attribute", name, value
 				new_impl.removeAttributeNS(name[0], name[1])
 

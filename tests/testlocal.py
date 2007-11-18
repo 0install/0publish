@@ -60,7 +60,7 @@ class TestLocal(unittest.TestCase):
 		assert len(master.implementations) == 2
 
 	def testMergeGroup(self):
-		master = parse(tap(merge.merge(header + "<group>\n    <implementation id='sha1=123' version='1'/>\n  </group>" + footer, local_file)))
+		master = parse(merge.merge(header + "<group>\n    <implementation id='sha1=123' version='1'/>\n  </group>" + footer, local_file))
 		assert master.uri == 'http://test/hello.xml', master
 		assert len(master.implementations) == 2
 		assert master.implementations['sha1=002'].requires == []
@@ -73,14 +73,16 @@ class TestLocal(unittest.TestCase):
 		assert len(deps) == 1
 		assert deps[0].interface == 'http://foo', deps[0]
 
+		assert master.implementations['sha1=003'].metadata['http://mynamespace/foo bob'] == 'bob'
+
 	def testNotSubset(self):
-		master = parse(tap(merge.merge(header + "<group a='a'>\n    <implementation id='sha1=123' version='1'/>\n  </group>" + footer, local_file)))
+		master = parse(merge.merge(header + "<group a='a'>\n    <implementation id='sha1=123' version='1'/>\n  </group>" + footer, local_file))
 		assert master.uri == 'http://test/hello.xml', master
 		assert len(master.implementations) == 2
 		assert master.implementations['sha1=123'].metadata.get('a', None) == 'a'
 		assert master.implementations['sha1=002'].metadata.get('a', None) == None
 
-		master = parse(tap(merge.merge(header + """\n
+		master = parse(merge.merge(header + """\n
   <group>
     <requires interface='http://foo' meta='foo'/>
     <implementation id='sha1=004' version='1'/>
@@ -90,7 +92,7 @@ class TestLocal(unittest.TestCase):
       <version before='1'/>
     </requires>
     <implementation id='sha1=001' version='1'/>
-  </group>""" + footer, local_file_req)))
+  </group>""" + footer, local_file_req))
 		assert len(master.implementations['sha1=001'].requires[0].restrictions) == 1
 		assert len(master.implementations['sha1=003'].requires[0].restrictions) == 0
 
@@ -100,14 +102,14 @@ class TestLocal(unittest.TestCase):
 		assert master.implementations['sha1=003'].main == 'hello'
 
 	def testMergeBest(self):
-		master_xml = tap(merge.merge(header + """\n
+		master_xml = merge.merge(header + """\n
   <group>
     <implementation id='sha1=123' version='1'/>
   </group>
   <group>
     <requires interface='http://foo'/>
     <implementation id='sha1=002' version='2'/>
-  </group>""" + footer, local_file_req))
+  </group>""" + footer, local_file_req)
 		master = parse(master_xml)
 		assert master.uri == 'http://test/hello.xml', master
 		assert len(master.implementations) == 3
@@ -118,14 +120,14 @@ class TestLocal(unittest.TestCase):
 		assert len(minidom.parseString(master_xml).documentElement.getElementsByTagNameNS(XMLNS_IFACE, 'group')) == 2
 	
 		# Again, but with the groups the other way around
-		master_xml = tap(merge.merge(header + """\n
+		master_xml = merge.merge(header + """\n
   <group>
     <requires interface='http://foo'/>
     <implementation id='sha1=002' version='2'/>
   </group>
   <group>
     <implementation id='sha1=123' version='1'/>
-  </group>""" + footer, local_file_req))
+  </group>""" + footer, local_file_req)
 		master = parse(master_xml)
 		assert master.uri == 'http://test/hello.xml', master
 		assert len(master.implementations) == 3
@@ -146,12 +148,12 @@ class TestLocal(unittest.TestCase):
 		assert ctx.attribs[(None, 'id')] == 'sha1=001'
 		assert ctx.attribs[(None, 'version')] == '1'
 
-		ctx = get_context("<group t='t' x='1' y:z='2' xmlns:y='foo'><implementation id='sha1=001' version='1' t='r'/></group>")
+		ctx = get_context("<group t='t' x='1' y:z='2' xmlns:y='yns'><implementation id='sha1=001' version='1' t='r'/></group>")
 		assert ctx.attribs[(None, 'id')] == 'sha1=001'
 		assert ctx.attribs[(None, 'version')] == '1'
 		assert ctx.attribs[(None, 't')] == 'r'
 		assert ctx.attribs[(None, 'x')] == '1'
-		assert ctx.attribs[('foo', 'z')] == '2'
+		assert ctx.attribs[('yns', 'z')] == '2'
 
 suite = unittest.makeSuite(TestLocal)
 if __name__ == '__main__':

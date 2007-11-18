@@ -1,5 +1,6 @@
 <?xml version="1.0" ?>
-<interface xmlns="http://zero-install.sourceforge.net/2004/injector/interface">
+<interface xmlns="http://zero-install.sourceforge.net/2004/injector/interface"
+	   xmlns:myns='http://mynamespace/foo'>
   <name>hello</name>
   <summary>prints hello</summary>
   <description>
@@ -7,7 +8,7 @@
   </description>
   <homepage>http://test/hello.html</homepage>
   <feed-for interface='http://test/hello.xml'/>
-  <group main='hello'>
+  <group main='hello' myns:bob='bob'>
     <requires interface='http://foo'/>
     <implementation id="sha1=003" version="0.3" x='x' y:z='z' xmlns:y='yns'/>
   </group>
