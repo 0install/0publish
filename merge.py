@@ -132,14 +132,16 @@ def merge(data, local):
 					xmltools.insert_element(req, group)
 
 		new_impl = master_doc.importNode(impl, True)
+
+		# Attributes might have been set on a parent group; move to the impl
+		for name in new_impl_context.attribs:
+			#print "Set", name, value
+			new_impl.setAttributeNS(name[0], name[1], new_impl_context.attribs[name])
+
 		for name, value in new_impl.attributes.itemsNS():
 			if name in group_context.attribs and group_context.attribs[name] == value:
 				#print "Deleting duplicate attribute", name, value
 				new_impl.removeAttributeNS(name[0], name[1])
-			else:
-				# Might have been on a parent group; move to the impl
-				#print "Set", name, value
-				new_impl.setAttributeNS(name[0], name[1], value)
 
 		xmltools.insert_element(new_impl, group)
 

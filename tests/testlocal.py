@@ -97,6 +97,8 @@ class TestLocal(unittest.TestCase):
 		assert master.implementations['sha1=004'].requires[0].metadata.get('meta', None) == 'foo'
 		assert master.implementations['sha1=003'].requires[0].metadata.get('meta', None) == None
 
+		assert master.implementations['sha1=003'].main == 'hello'
+
 	def testMergeBest(self):
 		master_xml = tap(merge.merge(header + """\n
   <group>
