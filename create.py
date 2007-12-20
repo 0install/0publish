@@ -53,7 +53,7 @@ _template = """<?xml version="1.0" ?>
 	 interface file to the directory containing the program.
 	 Usually, you can just leave it as '.'.
     -->
-    <implementation id="." version="0.1" released='Snapshot'/>
+    <implementation id="." version="0.1"/>
   </group>
 </interface>
 """
