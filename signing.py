@@ -1,6 +1,8 @@
 from zeroinstall import SafeException
 from zeroinstall.injector import gpg
 import tempfile, os, base64, sys, shutil
+import subprocess
+from logging import warn
 
 def check_signature(path):
 	data = file(path).read()
@@ -11,9 +13,13 @@ def check_signature(path):
 		data = data[:xml_comment + 1]
 		data_stream.close()
 	elif data.startswith('-----BEGIN'):
-		data_stream, sigs = gpg.check_stream(file(path))
-		sign_fn = sign_plain
-		data = data_stream.read()
+		warn("Plain GPG signatures are no longer supported - not checking signature!")
+		warn("Will save in XML format.")
+		child = subprocess.Popen(['gpg', '--decrypt', path], stdout = subprocess.PIPE)
+		data, unused = child.communicate()
+		import __main__
+		__main__.force_save = True
+		return data, sign_xml, None
 	else:
 		return data, sign_unsigned, None
 	for sig in sigs:
