@@ -70,7 +70,7 @@ def check(data, warnings = True):
 		except InvalidInterface, ex:
 			raise
 		except Exception, ex:
-			warn("Internal error", ex)
+			warn("Internal error: %s", ex)
 			raise InvalidInterface(str(ex))
 	finally:
 		os.unlink(tmp_name)
