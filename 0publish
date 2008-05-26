@@ -99,6 +99,9 @@ try:
 	old_sign_fn = sign_fn
 	old_key = key
 
+	if sign_fn is signing.sign_unsigned and options.key:
+		sign_fn = signing.sign_xml
+
 	while True:
 		# Validate the input...
 		try:
