@@ -28,6 +28,7 @@ known_elements = {
 	'requires' : ['interface'],
 	'version' : ['not-before', 'before'],
 	'environment' : ['name', 'insert', 'default', 'mode'],
+	'overlay' : ['src', 'mount-point'],
 }
 
 def checkElement(elem):
