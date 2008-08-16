@@ -55,6 +55,7 @@ def run_gpg(default_key, *arguments):
 	arguments = list(arguments)
 	if default_key is not None:
 		arguments = ['--default-key', default_key] + arguments
+	arguments.insert(0, '--use-agent')
 	arguments.insert(0, 'gpg')
 	if os.spawnvp(os.P_WAIT, 'gpg', arguments):
 		raise SafeException("Command '%s' failed" % arguments)
