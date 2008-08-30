@@ -1,4 +1,4 @@
-from xml.dom import Node, minidom, XMLNS_NAMESPACE
+from xml.dom import Node, XMLNS_NAMESPACE
 
 XMLNS_INTERFACE = "http://zero-install.sourceforge.net/2004/injector/interface"
 XMLNS_COMPILE = "http://zero-install.sourceforge.net/2006/namespaces/0compile"

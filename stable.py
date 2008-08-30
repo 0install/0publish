@@ -1,5 +1,5 @@
 from xml.dom import minidom
-from zeroinstall.injector import namespaces, model
+from zeroinstall.injector import namespaces
 from logging import warn
 
 def mark_stable(data):

@@ -1,8 +1,5 @@
-import os
 from xml.dom import minidom, XMLNS_NAMESPACE, Node
 from zeroinstall.injector.namespaces import XMLNS_IFACE
-from zeroinstall.injector import model, reader
-from logging import info
 import xmltools
 
 def childNodes(parent, namespaceURI = None, localName = None):

@@ -5,8 +5,7 @@
 import os
 import shutil
 import traceback
-from tempfile import mkdtemp, mkstemp
-import sha
+from tempfile import mkstemp
 import re
 from logging import debug, info, warn
 from zeroinstall import SafeException

@@ -3,7 +3,7 @@ from zeroinstall.injector import model, namespaces
 from zeroinstall.injector.reader import InvalidInterface, update
 from xml.dom import minidom, Node, XMLNS_NAMESPACE
 import tempfile
-from logging import warn, info, debug
+from logging import warn, info
 
 group_impl_attribs = ['version', 'version-modifier', 'released', 'main', 'stability', 'arch', 'license', 'doc-dir', 'self-test']
 

@@ -1,5 +1,5 @@
 from xml.dom import minidom, Node
-from zeroinstall.injector import namespaces, model
+from zeroinstall.injector import namespaces
 import time, re
 
 date_format = '\d{4}-\d{2}-\d{2}'

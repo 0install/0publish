@@ -1,5 +1,5 @@
 import os
-from xml.dom import minidom, XMLNS_NAMESPACE, Node
+from xml.dom import minidom, Node
 from zeroinstall.injector.namespaces import XMLNS_IFACE
 from zeroinstall.injector import model, reader
 

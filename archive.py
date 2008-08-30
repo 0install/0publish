@@ -1,13 +1,13 @@
 from xml.dom import minidom
 from zeroinstall import SafeException
-from zeroinstall.zerostore import Store, manifest
+from zeroinstall.zerostore import manifest
 try:
 	from zeroinstall.zerostore import unpack
 except ImportError:
 	# Older versions don't have it
 	import unpack
 from zeroinstall.injector import namespaces
-import os, time, re, shutil, tempfile
+import os, shutil, tempfile
 
 def ro_rmtree(root):
 	"""Like shutil.rmtree, except that we also delete with read-only items.
