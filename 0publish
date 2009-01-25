@@ -15,6 +15,7 @@ parser.add_option("--archive-url", help="add archive at this URL", action='store
 parser.add_option("--archive-file", help="local copy of archive-url", action='store', metavar='FILE')
 parser.add_option("--archive-extract", help="subdirectory of archive to extract", action='store', metavar='DIR')
 parser.add_option("-c", "--create", help="create file if nonexistant", action='store_true')
+parser.add_option("-d", "--add-digest", help="add extra digests", action='store', metavar='ALG')
 parser.add_option("-e", "--edit", help="edit with $EDITOR", action='store_true')
 parser.add_option("-g", "--gpgsign", help="add a GPG signature block", action='store_true')
 parser.add_option("-k", "--key", help="key to use for signing")
@@ -150,6 +151,9 @@ try:
 	if options.local:
 		import merge
 		data = merge.merge(data, options.local)
+	if options.add_digest:
+		import digest
+		data = digest.add_digests(data, alg = options.add_digest)
 	if options.edit:
 		data = edit.edit(data)
 
