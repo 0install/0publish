@@ -9,6 +9,9 @@ except ImportError:
 from zeroinstall.injector import namespaces
 import os, shutil, tempfile
 
+import digest
+import xmltools
+
 def ro_rmtree(root):
 	"""Like shutil.rmtree, except that we also delete with read-only items.
 	@param root: the root of the subtree to remove
@@ -41,7 +44,7 @@ def autopackage_get_start_offset(package):
 			return os.path.getsize(package) - int(line.split('"', 2)[1])
 	raise Exception("Can't find payload in autopackage (missing 'dataSize')")
 
-def add_archive(data, url, local_file, extract, alg):
+def add_archive(data, url, local_file, extract, algs):
 	if local_file is None:
 		local_file = os.path.abspath(os.path.basename(url))
 		if not os.path.exists(local_file):
@@ -50,9 +53,8 @@ def add_archive(data, url, local_file, extract, alg):
 
 	doc = minidom.parseString(data)
 
-	if alg is None:
-		alg = 'sha1new'
-	
+	assert algs
+
 	if local_file.endswith('.package'):
 		start_offset = autopackage_get_start_offset(local_file)
 		type = 'application/x-bzip-compressed-tar'
@@ -72,7 +74,8 @@ def add_archive(data, url, local_file, extract, alg):
 		else:
 			extracted = tmpdir
 
-		archive_id = manifest_for_dir(extracted, alg)
+		archive_id = manifest_for_dir(extracted, algs[0])
+		extra_digests = set([manifest_for_dir(extracted, a) for a in algs[1:]])
 	finally:
 		ro_rmtree(tmpdir)
 
@@ -93,11 +96,7 @@ def add_archive(data, url, local_file, extract, alg):
 	
 	assert impl.getAttribute('id') == archive_id
 
-	nl = doc.createTextNode('\n      ')
-	impl.appendChild(nl)
-
-	archive = doc.createElementNS(namespaces.XMLNS_IFACE, 'archive')
-	impl.appendChild(archive)
+	archive = xmltools.create_element(impl, 'archive')
 	archive.setAttribute('href', url)
 	archive.setAttribute('size', str(os.stat(local_file).st_size - start_offset))
 	if extract is not None:
@@ -107,7 +106,15 @@ def add_archive(data, url, local_file, extract, alg):
 	if type:
 		archive.setAttribute('type', type)
 
-	nl = doc.createTextNode('\n    ')
-	impl.appendChild(nl)
+	# Remove digests we already
+	for x in xmltools.children(impl, 'manifest-digest'):
+		digest_element = x
+		break
+	else:
+		digest_element = doc.createElementNS(namespaces.XMLNS_IFACE, 'manifest-digest')
+		xmltools.insert_before(digest_element, archive)
+	for x in extra_digests - set([digest.digests(impl)]):
+		name, value = x.split('=')
+		digest_element.setAttribute(name, value)
 
 	return doc.toxml()

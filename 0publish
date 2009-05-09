@@ -20,7 +20,7 @@ parser.add_option("-e", "--edit", help="edit with $EDITOR", action='store_true')
 parser.add_option("-g", "--gpgsign", help="add a GPG signature block", action='store_true')
 parser.add_option("-k", "--key", help="key to use for signing")
 parser.add_option("-l", "--local", help="create feed from local interface")
-parser.add_option("--manifest-algorithm", help="select algorithm for manifests", action='store', metavar='ALG')
+parser.add_option("--manifest-algorithm", help="select algorithm for manifests", action='append', metavar='ALG')
 parser.add_option("--set-interface-uri", help="set interface URI", action='store', metavar='URI')
 parser.add_option("--set-id", help="set implementation ID", action='store', metavar='DIGEST')
 parser.add_option("--set-main", help="set main executable", action='store', metavar='EXEC')
@@ -145,7 +145,13 @@ try:
 		data = stable.mark_stable(data)
 	if options.archive_url:
 		import archive
-		data = archive.add_archive(data, options.archive_url, options.archive_file, options.archive_extract, options.manifest_algorithm)
+		algs = options.manifest_algorithm
+		if algs is None:
+			algs = ['sha1new']
+			import hashlib
+			if hasattr(hashlib, 'sha256'):
+				algs.append('sha256')
+		data = archive.add_archive(data, options.archive_url, options.archive_file, options.archive_extract, algs)
 	elif options.archive_file or options.archive_extract:
 		raise Exception('Must use --archive-uri option')
 	if options.local:
