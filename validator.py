@@ -26,7 +26,7 @@ known_elements = {
 
 	'archive' : ['href', 'size', 'extract', 'type', 'start-offset'],
 	'recipe' : [],
-	'requires' : ['interface'],
+	'requires' : ['interface', 'use'],
 	'version' : ['not-before', 'before'],
 	'environment' : ['name', 'insert', 'default', 'mode'],
 	'overlay' : ['src', 'mount-point'],
