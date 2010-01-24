@@ -1,4 +1,4 @@
-#!/usr/bin/env python2.4
+#!/usr/bin/env python
 import sys, logging
 from StringIO import StringIO
 from zeroinstall.injector.reader import InvalidInterface

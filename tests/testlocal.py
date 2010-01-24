@@ -1,14 +1,14 @@
-#!/usr/bin/env python2.4
-import sys, os, tempfile
+#!/usr/bin/env python
+import sys, os, tempfile, StringIO
 from zeroinstall.injector.namespaces import XMLNS_IFACE
 from zeroinstall.injector.reader import InvalidInterface
-from zeroinstall.injector import model, reader
+from zeroinstall.injector import model, reader, qdom
 import unittest
 from xml.dom import minidom
 
 sys.path.insert(0, '..')
 
-import create, merge
+import create, merge, release
 
 header = """<?xml version="1.0" ?>
 <interface xmlns="http://zero-install.sourceforge.net/2004/injector/interface"
@@ -154,6 +154,19 @@ class TestLocal(unittest.TestCase):
 		assert ctx.attribs[(None, 't')] == 'r'
 		assert ctx.attribs[(None, 'x')] == '1'
 		assert ctx.attribs[('yns', 'z')] == '2'
+
+	def testSetAtttibs(self):
+		local_data = open(local_file).read()
+		result = release.set_attributes(local_data, '0.2', id = 'sha1=98765', version='3.7', main = None)
+		feed = model.ZeroInstallFeed(qdom.parse(StringIO.StringIO(str(result))), "local.xml")
+		assert len(feed.implementations) == 1
+		assert feed.implementations['sha1=98765'].get_version() == '3.7'
+
+		try:
+			result = release.set_attributes(local_data, '0.3', id = 'sha1=98765', version='3.7', main = None)
+			assert 0
+		except Exception, ex:
+			assert str(ex) == 'No implementations with version=0.3'
 
 suite = unittest.makeSuite(TestLocal)
 if __name__ == '__main__':

@@ -29,6 +29,7 @@ parser.add_option("--set-released", help="set release date", action='store', met
 parser.add_option("--set-stability", help="set stability", action='store', metavar='STABILITY')
 parser.add_option("--set-version", help="set version number", action='store', metavar='VERSION')
 parser.add_option("-s", "--stable", help="mark testing version stable", action='store_true')
+parser.add_option("", "--select-version", help="select version to use in --set-* commands", action='store', metavar='VERSION')
 parser.add_option("-x", "--xmlsign", help="add an XML signature block", action='store_true')
 parser.add_option("-u", "--unsign", help="remove any signature", action='store_true')
 parser.add_option("-v", "--verbose", help="more verbose output", action='count')
@@ -40,7 +41,7 @@ force_save = options.create
 
 if options.version:
 	print "0publish (zero-install) " + version
-	print "Copyright (C) 2005-2007 Thomas Leonard"
+	print "Copyright (C) 2005-2010 Thomas Leonard"
 	print "This program comes with ABSOLUTELY NO WARRANTY,"
 	print "to the extent permitted by law."
 	print "You may redistribute copies of this program"
@@ -137,10 +138,15 @@ try:
 	if options.set_id or options.set_version or options.set_released or \
 	   options.set_stability or options.set_arch or options.set_main:
 		import release
-		data = release.make_release(data, options.set_id,
-			options.set_version, options.set_released, options.set_stability,
-			options.set_main, options.set_arch)
+		data = release.set_attributes(data, options.select_version,
+					id = options.set_id,
+					version = options.set_version,
+					released = options.set_released,
+					stability = options.set_stability,
+					main = options.set_main,
+					arch = options.set_arch)
 	if options.stable:
+		assert not options.select_version, "Use --set-stability=stable --select-version=... instead"
 		import stable
 		data = stable.mark_stable(data)
 	if options.archive_url:
