@@ -14,13 +14,16 @@ def add_version(data, version):
 	"""Create a new <implementation> after the last one in the file."""
 	doc = minidom.parseString(data)
 	all_impls = doc.documentElement.getElementsByTagNameNS(namespaces.XMLNS_IFACE, 'implementation')
-	if not all_impls:
-		raise Exception('No existing <implementation> elements found!')
 	new_impl = doc.createElementNS(namespaces.XMLNS_IFACE, 'implementation')
 	new_impl.setAttribute('version', version)
 	new_impl.setAttribute('id', '.')
 
-	last_impl = all_impls[-1]
+	if not all_impls:
+		print 'No existing <implementation> elements found; creating first one!'
+		next = None
+		last_impl = doc.documentElement.childNodes[-1]
+	else:
+		last_impl = all_impls[-1]
 	previous = last_impl.previousSibling
 	next = last_impl.nextSibling
 	parent = last_impl.parentNode
