@@ -10,6 +10,7 @@ import edit, validator, create
 version = '0.17'
 
 parser = OptionParser(usage="usage: %prog [options] interface")
+parser.add_option("--add-types", help="add missing MIME-type attributes", action='store_true')
 parser.add_option("--add-version", help="add a new implementation", action='store', metavar='VERSION')
 parser.add_option("--archive-url", help="add archive at this URL", action='store', metavar='URL')
 parser.add_option("--archive-file", help="local copy of archive-url", action='store', metavar='FILE')
@@ -166,6 +167,9 @@ try:
 	if options.add_digest:
 		import digest
 		data = digest.add_digests(data, alg = options.add_digest)
+	if options.add_types:
+		import mimetypes
+		data = mimetypes.add_types(data)
 	if options.edit:
 		data = edit.edit(data)
 
