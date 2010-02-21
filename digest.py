@@ -7,7 +7,9 @@ from logging import info
 stores = Stores()
 
 def digests(impl):
-	yield impl.getAttribute('id').split('=', 1)
+	id = impl.getAttribute('id')
+	if '=' in id:
+		yield id.split('=', 1)
 	for x in xmltools.children(impl, 'manifest-digest'):
 		for name, value in x.attributes.itemsNS():
 			if name[0] is None:
