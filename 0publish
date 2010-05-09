@@ -194,7 +194,7 @@ try:
 
 	# Tidy up the XML
 	doc = minidom.parseString(data)
-	data = create.xml_header + doc.documentElement.toxml()
+	data = create.xml_header + doc.documentElement.toxml('utf-8')
 
 	# Write it back out
 	if not data.endswith('\n'): data += '\n'

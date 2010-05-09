@@ -5,7 +5,7 @@ from xml.dom import minidom, Node, XMLNS_NAMESPACE
 import tempfile
 from logging import warn, info
 
-group_impl_attribs = ['version', 'version-modifier', 'released', 'main', 'stability', 'arch', 'license', 'doc-dir', 'self-test']
+group_impl_attribs = ['version', 'version-modifier', 'released', 'main', 'stability', 'arch', 'license', 'doc-dir', 'self-test', 'langs']
 
 known_elements = {
 	'interface' : ['uri', 'min-injector-version', 'main'],	# (main is deprecated)
