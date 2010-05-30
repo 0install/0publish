@@ -1,5 +1,8 @@
 #!/usr/bin/env python
 import unittest, os, sys
+for x in ['LANGUAGE', 'LANG']:
+	if x in os.environ:
+		del os.environ[x]
 try:
 	import coverage
 	coverage.erase()
