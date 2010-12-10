@@ -5,7 +5,7 @@ from xml.dom import minidom, Node, XMLNS_NAMESPACE
 import tempfile
 from logging import warn, info
 
-group_impl_attribs = ['version', 'version-modifier', 'released', 'main', 'stability', 'arch', 'license', 'doc-dir', 'self-test', 'langs']
+group_impl_attribs = ['version', 'version-modifier', 'released', 'main', 'stability', 'arch', 'license', 'doc-dir', 'self-test', 'langs', 'local-path']
 
 known_elements = {
 	'interface' : ['uri', 'min-injector-version', 'main'],	# (main is deprecated)
@@ -23,10 +23,13 @@ known_elements = {
 	'implementation' : ['id'] + group_impl_attribs,
 	'package-implementation' : ['package', 'main'],
 	'manifest-digest' : ['sha1new', 'sha256'],
+	'command' : ['name', 'path'],
+	'arg' : [],
 
 	'archive' : ['href', 'size', 'extract', 'type', 'start-offset'],
 	'recipe' : [],
 	'requires' : ['interface', 'use'],
+	'runner' : ['interface', 'use'],
 	'version' : ['not-before', 'before'],
 	'environment' : ['name', 'insert', 'default', 'mode'],
 	'overlay' : ['src', 'mount-point'],
