@@ -25,6 +25,6 @@
   <feed-for interface="http://0install.net/2006/interfaces/0publish"/>
 
   <group main="0publish" self-test="tests/testall.py">
-    <implementation id="." released="2010-12-10" version="0.18"/>
+    <implementation id="." version="0.18-post"/>
   </group>
 </interface>
