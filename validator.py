@@ -31,7 +31,7 @@ known_elements = {
 	'requires' : ['interface', 'use'],
 	'runner' : ['interface', 'use'],
 	'version' : ['not-before', 'before'],
-	'environment' : ['name', 'insert', 'default', 'mode'],
+	'environment' : ['name', 'insert', 'value', 'default', 'mode'],
 	'overlay' : ['src', 'mount-point'],
 }
 
