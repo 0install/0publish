@@ -38,6 +38,7 @@ def parse(xml):
 
 local_file = os.path.join(os.path.dirname(__file__), 'local.xml')
 local_file_req = os.path.join(os.path.dirname(__file__), 'local-req.xml')
+local_file_command = os.path.join(os.path.dirname(__file__), 'local-command.xml')
 
 def tap(s):
 	#print s
@@ -136,6 +137,90 @@ class TestLocal(unittest.TestCase):
 		assert deps[0].interface == 'http://foo', deps[0]
 
 		assert len(minidom.parseString(master_xml).documentElement.getElementsByTagNameNS(XMLNS_IFACE, 'group')) == 2
+
+	def testMergeCommand(self):
+		# We create a new group inside this one, sharing the <requires> and adding the <command>
+		master_xml = merge.merge(header + """
+  <group>
+    <requires interface='http://foo'>
+      <environment name='TESTING' value='true' mode='replace'/>
+    </requires>
+    <implementation id='sha1=002' version='2'/>
+  </group>""" + footer, local_file_command)
+		master = parse(master_xml)
+		assert master.uri == 'http://test/hello.xml', master
+		assert len(master.implementations) == 2
+		commands = master.implementations['sha1=003'].commands
+		assert len(commands) == 1
+		assert commands['run'].path == 'run.sh', commands['run'].path
+
+		new_root = minidom.parseString(master_xml).documentElement
+		assert len(new_root.getElementsByTagNameNS(XMLNS_IFACE, 'group')) == 2
+		assert len(new_root.getElementsByTagNameNS(XMLNS_IFACE, 'requires')) == 1
+		assert len(new_root.getElementsByTagNameNS(XMLNS_IFACE, 'command')) == 1
+	
+		# We create a new top-level group inside this one, as we can't share the test command
+		master_xml = merge.merge(header + """
+  <group>
+    <requires interface='http://foo'>
+      <environment name='TESTING' value='true' mode='replace'/>
+    </requires>
+    <command name='test' path='test.sh'/>
+    <implementation id='sha1=002' version='2'/>
+  </group>""" + footer, local_file_command)
+		master = parse(master_xml)
+		assert master.uri == 'http://test/hello.xml', master
+		assert len(master.implementations) == 2
+		commands = master.implementations['sha1=003'].commands
+		assert len(commands) == 1
+		assert commands['run'].path == 'run.sh', commands['run'].path
+
+		new_root = minidom.parseString(master_xml).documentElement
+		assert len(new_root.getElementsByTagNameNS(XMLNS_IFACE, 'group')) == 2
+		assert len(new_root.getElementsByTagNameNS(XMLNS_IFACE, 'requires')) == 2
+		assert len(new_root.getElementsByTagNameNS(XMLNS_IFACE, 'command')) == 2
+	
+		# We share the <requires> and override the <command>
+		master_xml = merge.merge(header + """
+  <group>
+    <requires interface='http://foo'>
+      <environment name='TESTING' value='true' mode='replace'/>
+    </requires>
+    <command name='run' path='old-run.sh'/>
+    <implementation id='sha1=002' version='2'/>
+  </group>""" + footer, local_file_command)
+		master = parse(master_xml)
+		assert master.uri == 'http://test/hello.xml', master
+		assert len(master.implementations) == 2
+		commands = master.implementations['sha1=003'].commands
+		assert len(commands) == 1
+		assert commands['run'].path == 'run.sh', commands['run'].path
+
+		new_root = minidom.parseString(master_xml).documentElement
+		assert len(new_root.getElementsByTagNameNS(XMLNS_IFACE, 'group')) == 2
+		assert len(new_root.getElementsByTagNameNS(XMLNS_IFACE, 'requires')) == 1
+		assert len(new_root.getElementsByTagNameNS(XMLNS_IFACE, 'command')) == 2
+
+		# We share the <requires> and the <command>
+		master_xml = merge.merge(header + """
+  <group>
+    <requires interface='http://foo'>
+      <environment name='TESTING' value='true' mode='replace'/>
+    </requires>
+    <command name='run' path='run.sh'/>
+    <implementation id='sha1=002' version='2'/>
+  </group>""" + footer, local_file_command)
+		master = parse(master_xml)
+		assert master.uri == 'http://test/hello.xml', master
+		assert len(master.implementations) == 2
+		commands = master.implementations['sha1=003'].commands
+		assert len(commands) == 1
+		assert commands['run'].path == 'run.sh', commands['run'].path
+
+		new_root = minidom.parseString(master_xml).documentElement
+		assert len(new_root.getElementsByTagNameNS(XMLNS_IFACE, 'group')) == 1
+		assert len(new_root.getElementsByTagNameNS(XMLNS_IFACE, 'requires')) == 1
+		assert len(new_root.getElementsByTagNameNS(XMLNS_IFACE, 'command')) == 1
 	
 	def testLocalContext(self):
 		def get_context(xml_frag):
@@ -170,5 +255,4 @@ class TestLocal(unittest.TestCase):
 
 suite = unittest.makeSuite(TestLocal)
 if __name__ == '__main__':
-	sys.argv.append('-v')
 	unittest.main()

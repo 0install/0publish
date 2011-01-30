@@ -15,6 +15,7 @@ class Context:
 		doc = impl.ownerDocument
 		self.attribs = {}
 		self.requires = []
+		self.commands = {}
 
 		node = impl
 		while True:
@@ -24,9 +25,12 @@ class Context:
 				elif name not in self.attribs:
 					self.attribs[name] = value
 			if node.nodeName == 'group':
-				# We don't care about <requires> inside <implementation>; they'll get copied over anyway
+				# We don't care about <requires> or <command> inside <implementation>;
+				# they'll get copied over anyway
 				for x in childNodes(node, XMLNS_IFACE, 'requires'):
 					self.requires.append(x)
+				for x in childNodes(node, XMLNS_IFACE, 'command'):
+					self.commands[x.getAttribute('name')] = x
 			node = node.parentNode
 			if node.nodeName != 'group':
 				break
@@ -82,13 +86,16 @@ def score_subset(group, impl):
 		if key not in impl.attribs.keys():
 			#print "BAD", key
 			return (0,)		# Group sets an attribute the impl doesn't want
+	for name, g_command in group.commands.iteritems():
+		if name not in impl.commands:
+			return (0,)		# Group sets a command the impl doesn't want
 	for g_req in group.requires:
 		for i_req in impl.requires:
 			if nodesEqual(g_req, i_req): break
 		else:
 			return (0,)		# Group adds a requires that the impl doesn't want
-	# Score result so we get groups that have all the same requires first, then ones with all the same attribs
-	return (1, len(group.requires), len(group.attribs))
+	# Score result so we get groups that have all the same requires/commands first, then ones with all the same attribs
+	return (1, len(group.requires) + len(group.commands), len(group.attribs))
 
 # Note: the namespace stuff isn't quite right yet.
 # Might get conflicts if both documents use the same prefix for different things.
@@ -100,11 +107,13 @@ def merge(data, local):
 	for impl in find_impls(local_doc.documentElement):
 		# 1. Get the context of the implementation to add. This is:
 		#    - The set of its requirements
+		#    - The set of its commands
 		#    - Its attributes
 		new_impl_context = Context(impl)
 
 		# 2. For each <group> in the master feed, see if it provides a compatible context:
 		#    - A subset of the new implementation's requirements
+		#    - A subset of the new implementation's command names
 		#    - A subset of the new implementation's attributes (names, not values)
 		#    Choose the most compatible <group> (the root counts as a minimally compatible group)
 
@@ -119,11 +128,17 @@ def merge(data, local):
 		group = best_group[1]
 		group_context = Context(group)
 
+		new_commands = []
+		for name, new_command in new_impl_context.commands.iteritems():
+			old_command = group_context.commands.get(name, None)
+			if not (old_command and nodesEqual(old_command, new_command)):
+				new_commands.append(master_doc.importNode(new_command, True))
+
 		# If we have additional requirements, we'll need to create a subgroup and add them
-		if len(new_impl_context.requires) > len(group_context.requires):
+		if len(new_impl_context.requires) > len(group_context.requires) or new_commands:
 			subgroup = xmltools.create_element(group, 'group')
 			group = subgroup
-			group_context = Context(group)
+			#group_context = Context(group)
 			for x in new_impl_context.requires:
 				for y in group_context.requires:
 					if nodesEqual(x, y): break
@@ -131,6 +146,8 @@ def merge(data, local):
 					req = master_doc.importNode(x, True)
 					#print "Add", req
 					xmltools.insert_element(req, group)
+			for c in new_commands:
+				xmltools.insert_element(c, group)
 
 		new_impl = master_doc.importNode(impl, True)
 
