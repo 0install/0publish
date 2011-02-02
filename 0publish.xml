@@ -28,6 +28,6 @@
     <requires interface="http://0install.net/2007/interfaces/ZeroInstall.xml">
       <environment insert="" mode="prepend" name="PYTHONPATH"/>
     </requires>
-    <implementation id="." released="2011-02-02" version="0.19"/>
+    <implementation id="." version="0.19-post"/>
   </group>
 </interface>
