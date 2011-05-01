@@ -25,19 +25,19 @@
   <feed-for interface="http://0install.net/2006/interfaces/0publish"/>
 
   <group main="0publish">
-    <command name='run' path='0publish'>
-      <runner interface='http://repo.roscidus.com/python/python'>
-	<version before='3'/>
+    <command name="run" path="0publish">
+      <runner interface="http://repo.roscidus.com/python/python">
+	<version before="3"/>
       </runner>
     </command>
     <command name="test" path="tests/testall.py">
-      <runner interface='http://repo.roscidus.com/python/python'>
-	<version before='3'/>
+      <runner interface="http://repo.roscidus.com/python/python">
+	<version before="3"/>
       </runner>
     </command>
     <requires interface="http://0install.net/2007/interfaces/ZeroInstall.xml">
       <environment insert="" mode="prepend" name="PYTHONPATH"/>
     </requires>
-    <implementation id="." version="0.19-post"/>
+    <implementation id="." released="2011-05-01" version="0.20"/>
   </group>
 </interface>
