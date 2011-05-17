@@ -23,7 +23,7 @@ known_elements = {
 	'implementation' : ['id'] + group_impl_attribs,
 	'package-implementation' : ['package', 'main', 'distributions'],
 	'manifest-digest' : ['sha1new', 'sha256'],
-	'command' : ['name', 'path'],
+	'command' : ['name', 'path', 'shell-command'],
 	'arg' : [],
 
 	'archive' : ['href', 'size', 'extract', 'type', 'start-offset'],
