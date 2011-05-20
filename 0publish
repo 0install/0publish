@@ -19,7 +19,6 @@ parser.add_option("-k", "--key", help="key to use for signing")
 parser.add_option("-l", "--local", help="deprecated; use --add-from instead", dest='add_from', metavar='LOCAL')
 parser.add_option("--manifest-algorithm", help="select algorithm for manifests", action='append', metavar='ALG')
 parser.add_option("-s", "--stable", help="mark testing version stable", action='store_true')
-parser.add_option("", "--select-version", help="select version to use in --set-* commands", action='store', metavar='VERSION')
 parser.add_option("-x", "--xmlsign", help="add an XML signature block", action='store_true')
 parser.add_option("-u", "--unsign", help="remove any signature", action='store_true')
 parser.add_option("-v", "--verbose", help="more verbose output", action='count')
@@ -118,7 +117,6 @@ try:
 		print "Changing key from '%s' to '%s'" % (key, options.key)
 		key = options.key
 	if options.stable:
-		assert not options.select_version, "Use --set-stability=stable --select-version=... instead"
 		import stable
 		data = stable.mark_stable(data)
 	if options.add_from:
