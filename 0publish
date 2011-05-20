@@ -12,7 +12,6 @@ version = '0.20'
 parser = OptionParser(usage="usage: %prog [options] interface")
 parser.add_option("-a", "--add-from", help="add implementations from FEED", metavar='FEED')
 parser.add_option("--add-types", help="add missing MIME-type attributes", action='store_true')
-parser.add_option("--add-version", help="add a new implementation", action='store', metavar='VERSION')
 parser.add_option("--archive-url", help="add archive at this URL", action='store', metavar='URL')
 parser.add_option("--archive-file", help="local copy of archive-url", action='store', metavar='FILE')
 parser.add_option("--archive-extract", help="subdirectory of archive to extract", action='store', metavar='DIR')
@@ -134,9 +133,6 @@ try:
 	if options.set_interface_uri:
 		import release
 		data = release.set_interface_uri(data, options.set_interface_uri)
-	if options.add_version:
-		import release
-		data = release.add_version(data, options.add_version)
 	if options.set_id or options.set_version or options.set_released or \
 	   options.set_stability or options.set_arch or options.set_main:
 		import release

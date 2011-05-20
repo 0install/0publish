@@ -10,28 +10,6 @@ def set_interface_uri(data, uri):
 	doc.documentElement.setAttribute('uri', uri)
 	return doc.toxml()
 
-def add_version(data, version):
-	"""Create a new <implementation> after the last one in the file."""
-	doc = minidom.parseString(data)
-	all_impls = doc.documentElement.getElementsByTagNameNS(namespaces.XMLNS_IFACE, 'implementation')
-	new_impl = doc.createElementNS(namespaces.XMLNS_IFACE, 'implementation')
-	new_impl.setAttribute('version', version)
-	new_impl.setAttribute('id', '.')
-
-	if not all_impls:
-		print 'No existing <implementation> elements found; creating first one!'
-		next = None
-		last_impl = doc.documentElement.childNodes[-1]
-	else:
-		last_impl = all_impls[-1]
-	previous = last_impl.previousSibling
-	next = last_impl.nextSibling
-	parent = last_impl.parentNode
-	if previous and previous.nodeType == Node.TEXT_NODE:
-		parent.insertBefore(doc.createTextNode(previous.nodeValue), next)
-	parent.insertBefore(new_impl, next)
-	return doc.toxml()
-
 def set_attributes(data, selected_version, id = None, version = None, released = None, stability = None, main = None, arch = None):
 	"""Normally there's only one implementation, but we can cope with several."""
 	if released == 'today': released = time.strftime('%Y-%m-%d')
