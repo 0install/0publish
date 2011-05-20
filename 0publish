@@ -12,9 +12,6 @@ version = '0.20'
 parser = OptionParser(usage="usage: %prog [options] interface")
 parser.add_option("-a", "--add-from", help="add implementations from FEED", metavar='FEED')
 parser.add_option("--add-types", help="add missing MIME-type attributes", action='store_true')
-parser.add_option("--archive-url", help="add archive at this URL", action='store', metavar='URL')
-parser.add_option("--archive-file", help="local copy of archive-url", action='store', metavar='FILE')
-parser.add_option("--archive-extract", help="subdirectory of archive to extract", action='store', metavar='DIR')
 parser.add_option("-c", "--create", help="create file if nonexistant", action='store_true')
 parser.add_option("-d", "--add-digest", help="add extra digests", action='store', metavar='ALG')
 parser.add_option("-e", "--edit", help="edit with $EDITOR", action='store_true')
@@ -147,17 +144,6 @@ try:
 		assert not options.select_version, "Use --set-stability=stable --select-version=... instead"
 		import stable
 		data = stable.mark_stable(data)
-	if options.archive_url:
-		import archive
-		algs = options.manifest_algorithm
-		if algs is None:
-			algs = ['sha1new']
-			import hashlib
-			if hasattr(hashlib, 'sha256'):
-				algs.append('sha256')
-		data = archive.add_archive(data, options.archive_url, options.archive_file, options.archive_extract, algs)
-	elif options.archive_file or options.archive_extract:
-		raise Exception('Must use --archive-uri option')
 	if options.add_from:
 		import merge
 		data = merge.merge(data, options.add_from)
