@@ -4,12 +4,6 @@ import time, re
 
 date_format = '\d{4}-\d{2}-\d{2}'
 
-def set_interface_uri(data, uri):
-	"""Set the uri attribute on the root element."""
-	doc = minidom.parseString(data)
-	doc.documentElement.setAttribute('uri', uri)
-	return doc.toxml()
-
 def set_attributes(data, selected_version, id = None, version = None, released = None, stability = None, main = None, arch = None):
 	"""Normally there's only one implementation, but we can cope with several."""
 	if released == 'today': released = time.strftime('%Y-%m-%d')

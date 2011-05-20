@@ -18,7 +18,6 @@ parser.add_option("-e", "--edit", help="edit with $EDITOR", action='store_true')
 parser.add_option("-k", "--key", help="key to use for signing")
 parser.add_option("-l", "--local", help="deprecated; use --add-from instead", dest='add_from', metavar='LOCAL')
 parser.add_option("--manifest-algorithm", help="select algorithm for manifests", action='append', metavar='ALG')
-parser.add_option("--set-interface-uri", help="set interface URI", action='store', metavar='URI')
 parser.add_option("--set-id", help="set implementation ID", action='store', metavar='DIGEST')
 parser.add_option("--set-main", help="set main executable", action='store', metavar='EXEC')
 parser.add_option("--set-arch", help="set architecture", action='store', metavar='ARCH')
@@ -124,9 +123,6 @@ try:
 	if options.key:
 		print "Changing key from '%s' to '%s'" % (key, options.key)
 		key = options.key
-	if options.set_interface_uri:
-		import release
-		data = release.set_interface_uri(data, options.set_interface_uri)
 	if options.set_id or options.set_version or options.set_released or \
 	   options.set_stability or options.set_arch or options.set_main:
 		import release
