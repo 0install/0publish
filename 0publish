@@ -15,7 +15,6 @@ parser.add_option("--add-types", help="add missing MIME-type attributes", action
 parser.add_option("-c", "--create", help="create file if nonexistant", action='store_true')
 parser.add_option("-d", "--add-digest", help="add extra digests", action='store', metavar='ALG')
 parser.add_option("-e", "--edit", help="edit with $EDITOR", action='store_true')
-parser.add_option("-g", "--gpgsign", help="add a GPG signature block", action='store_true')
 parser.add_option("-k", "--key", help="key to use for signing")
 parser.add_option("-l", "--local", help="deprecated; use --add-from instead", dest='add_from', metavar='LOCAL')
 parser.add_option("--manifest-algorithm", help="select algorithm for manifests", action='append', metavar='ALG')
@@ -122,8 +121,6 @@ try:
 		sign_fn = signing.sign_xml
 	if options.unsign:
 		sign_fn = signing.sign_unsigned
-	if options.gpgsign:
-		sign_fn = signing.sign_plain
 	if options.key:
 		print "Changing key from '%s' to '%s'" % (key, options.key)
 		key = options.key
