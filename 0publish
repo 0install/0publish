@@ -18,12 +18,6 @@ parser.add_option("-e", "--edit", help="edit with $EDITOR", action='store_true')
 parser.add_option("-k", "--key", help="key to use for signing")
 parser.add_option("-l", "--local", help="deprecated; use --add-from instead", dest='add_from', metavar='LOCAL')
 parser.add_option("--manifest-algorithm", help="select algorithm for manifests", action='append', metavar='ALG')
-parser.add_option("--set-id", help="set implementation ID", action='store', metavar='DIGEST')
-parser.add_option("--set-main", help="set main executable", action='store', metavar='EXEC')
-parser.add_option("--set-arch", help="set architecture", action='store', metavar='ARCH')
-parser.add_option("--set-released", help="set release date", action='store', metavar='DATE')
-parser.add_option("--set-stability", help="set stability", action='store', metavar='STABILITY')
-parser.add_option("--set-version", help="set version number", action='store', metavar='VERSION')
 parser.add_option("-s", "--stable", help="mark testing version stable", action='store_true')
 parser.add_option("", "--select-version", help="select version to use in --set-* commands", action='store', metavar='VERSION')
 parser.add_option("-x", "--xmlsign", help="add an XML signature block", action='store_true')
@@ -123,16 +117,6 @@ try:
 	if options.key:
 		print "Changing key from '%s' to '%s'" % (key, options.key)
 		key = options.key
-	if options.set_id or options.set_version or options.set_released or \
-	   options.set_stability or options.set_arch or options.set_main:
-		import release
-		data = release.set_attributes(data, options.select_version,
-					id = options.set_id,
-					version = options.set_version,
-					released = options.set_released,
-					stability = options.set_stability,
-					main = options.set_main,
-					arch = options.set_arch)
 	if options.stable:
 		assert not options.select_version, "Use --set-stability=stable --select-version=... instead"
 		import stable
