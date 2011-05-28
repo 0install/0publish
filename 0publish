@@ -13,7 +13,9 @@ parser = OptionParser(usage="usage: %prog [options] interface")
 parser.add_option("-a", "--add-from", help="add implementations from FEED", metavar='FEED')
 parser.add_option("--add-types", help="add missing MIME-type attributes", action='store_true')
 parser.add_option("-c", "--create", help="create file if nonexistant", action='store_true')
-parser.add_option("-d", "--add-digest", help="add extra digests", action='store', metavar='ALG')
+parser.add_option("-d", "--add-digests", 
+                  help="add manifest digests to implementations",
+                  action='store', metavar='ALGORITHM')
 parser.add_option("-e", "--edit", help="edit with $EDITOR", action='store_true')
 parser.add_option("-k", "--key", help="key to use for signing")
 parser.add_option("-m", "--merge", help="deprecated; use --add-from instead", dest='add_from', metavar='LOCAL')
@@ -121,9 +123,9 @@ try:
 	if options.add_from:
 		import merge
 		data = merge.merge(data, options.add_from)
-	if options.add_digest:
+	if options.add_digests:
 		import digest
-		data = digest.add_digests(data, alg = options.add_digest)
+		data = digest.add_digests(data, alg = options.add_digests)
 	if options.add_types:
 		import mimetypes
 		data = mimetypes.add_types(data)
