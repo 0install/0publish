@@ -17,7 +17,6 @@ parser.add_option("-d", "--add-digest", help="add extra digests", action='store'
 parser.add_option("-e", "--edit", help="edit with $EDITOR", action='store_true')
 parser.add_option("-k", "--key", help="key to use for signing")
 parser.add_option("-m", "--merge", help="deprecated; use --add-from instead", dest='add_from', metavar='LOCAL')
-parser.add_option("--manifest-algorithm", help="select algorithm for manifests", action='append', metavar='ALG')
 parser.add_option("-s", "--stable", help="mark testing version stable", action='store_true')
 parser.add_option("-x", "--xmlsign", help="add an XML signature block", action='store_true')
 parser.add_option("-u", "--unsign", help="remove any signature", action='store_true')
