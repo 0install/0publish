@@ -10,19 +10,19 @@ import edit, validator, create
 version = '0.21'
 
 parser = OptionParser(usage="usage: %prog [options] interface")
-parser.add_option("-a", "--add-from", help="add implementations from FEED", metavar='FEED')
-parser.add_option("--add-types", help="add missing MIME-type attributes", action='store_true')
-parser.add_option("-c", "--create", help="create file if nonexistant", action='store_true')
+parser.add_option("-a", "--add-from", help="Add implementations from FEED", metavar='FEED')
 parser.add_option("-d", "--add-digests", 
                   help="add manifest digests to implementations",
                   action='store', metavar='ALGORITHM')
+parser.add_option("--add-types", help="Add missing MIME-type attributes", action='store_true')
+parser.add_option("-c", "--create", help="create file if nonexistant", action='store_true')
 parser.add_option("-e", "--edit", help="edit with $EDITOR", action='store_true')
 parser.add_option("-k", "--key", help="key to use for signing")
 parser.add_option("-m", "--merge", help="deprecated; use --add-from instead", dest='add_from', metavar='LOCAL')
-parser.add_option("-s", "--stable", help="mark testing version stable", action='store_true')
-parser.add_option("-x", "--xmlsign", help="add an XML signature block", action='store_true')
-parser.add_option("-u", "--unsign", help="remove any signature", action='store_true')
-parser.add_option("-v", "--verbose", help="more verbose output", action='count')
+parser.add_option("-s", "--stable", help="Mark the last version stable", action='store_true')
+parser.add_option("-x", "--xmlsign", help="Add an XML signature block", action='store_true')
+parser.add_option("-u", "--unsign", help="Remove any signature", action='store_true')
+parser.add_option("-v", "--verbose", help="More verbose output", action='count')
 parser.add_option("-V", "--version", help="display version information", action='store_true')
 
 (options, args) = parser.parse_args()
