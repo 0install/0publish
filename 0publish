@@ -7,7 +7,7 @@ import signing
 from logging import info, debug
 import edit, validator, create
 
-version = '0.21'
+version = '0.1'
 
 parser = OptionParser(usage="usage: %prog [options] interface")
 parser.add_option("-d", "--add-digests", 

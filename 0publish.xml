@@ -22,22 +22,22 @@
     <release:action phase="commit-release">sed -i &quot;s/^version = '.*'$/version = '$RELEASE_VERSION'/&quot; 0publish</release:action>
   </release:management>
 
-  <feed-for interface="http://0install.net/2006/interfaces/0publish"/>
+  <feed-for interface="http://0install.net/tools/0publish.xml"/>
 
   <group main="0publish">
     <command name="run" path="0publish">
       <runner interface="http://repo.roscidus.com/python/python">
-	<version before="3"/>
+        <version before="3"/>
       </runner>
     </command>
     <command name="test" path="tests/testall.py">
       <runner interface="http://repo.roscidus.com/python/python">
-	<version before="3"/>
+        <version before="3"/>
       </runner>
     </command>
     <requires interface="http://0install.net/2007/interfaces/ZeroInstall.xml">
       <environment insert="" mode="prepend" name="PYTHONPATH"/>
     </requires>
-    <implementation id="." version="0.20-post"/>
+    <implementation id="." version="0.1-post"/>
   </group>
 </interface>
