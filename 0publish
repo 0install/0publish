@@ -97,21 +97,22 @@ try:
 	if sign_fn is signing.sign_unsigned and options.key:
 		sign_fn = signing.sign_xml
 
-	while True:
-		# Validate the input...
-		try:
-			validator.check(data, warnings = False)	# Don't warn on load AND save!
-			break
-		except validator.InvalidInterface, ex:
-			print "Invalid interface: " + str(ex)
+        if not options.add_sizes: # must skip assert archive has size validation
+                while True:
+                        # Validate the input...
+                        try:
+                                validator.check(data, warnings = False)	# Don't warn on load AND save!
+                                break
+                        except validator.InvalidInterface, ex:
+                                print "Invalid interface: " + str(ex)
 
-		while True:
-			ans = raw_input("Interface is invalid. (E)dit or (A)bort?").lower()
-			if ans in ('e', 'edit'):
-				data = edit.edit(data)
-				options.edit = False	# Don't edit twice
-				break
-			if ans in ('a', 'abort'): sys.exit(1)
+                        while True:
+                                ans = raw_input("Interface is invalid. (E)dit or (A)bort?").lower()
+                                if ans in ('e', 'edit'):
+                                        data = edit.edit(data)
+                                        options.edit = False	# Don't edit twice
+                                        break
+                                if ans in ('a', 'abort'): sys.exit(1)
 
 	# Process it...
 	if options.sign:

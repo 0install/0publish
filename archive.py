@@ -10,18 +10,22 @@ def add_sizes(data):
 
 	to_change = [(archive, Download(archive.getAttribute('href')))  
 	      		for archive in archives 
-		       	if archive.getAttribute('size') is None]
+		       	if archive.getAttribute('size') is None or archive.getAttribute('size') == '']
 
 	for archive, download in to_change:
 		download.start()
 
 	blockers = [download.downloaded for archive, download in to_change]
-	for archive, download in to_change:
-		while not download.downloaded.happened:
-			yield blockers
-			tasks.check(blockers)
-		size = download.get_bytes_downloaded_so_far
-		archive.setAttribute('size', size)
 
+	@tasks.async
+	def add_sizes_():
+		for archive, download in to_change:
+			while not download.downloaded.happened:
+				yield blockers
+				tasks.check(blockers)
+			size = download.get_bytes_downloaded_so_far()
+			archive.setAttribute('size', str(size))
+
+	tasks.wait_for_blocker(add_sizes_())
 	return doc.toxml()
 
