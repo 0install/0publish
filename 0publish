@@ -23,7 +23,7 @@ parser.add_option("-e", "--edit", help="edit with $EDITOR", action='store_true')
 parser.add_option("-k", "--key", help="key to use for signing")
 parser.add_option("-m", "--merge", help="Merge FEED with given feed", metavar='FEED')
 parser.add_option("-s", "--stable", help="Mark the last version stable", action='store_true')
-parser.add_option("-x", "--xmlsign", help="Add an XML signature block", action='store_true')
+parser.add_option("-x", "--sign", help="Add an XML signature block", action='store_true')
 parser.add_option("-u", "--unsign", help="Remove any signature", action='store_true')
 parser.add_option("-v", "--verbose", help="More verbose output", action='count')
 parser.add_option("-V", "--version", help="display version information", action='store_true')
@@ -114,7 +114,7 @@ try:
 			if ans in ('a', 'abort'): sys.exit(1)
 
 	# Process it...
-	if options.xmlsign:
+	if options.sign:
 		sign_fn = signing.sign_xml
 	if options.unsign:
 		sign_fn = signing.sign_unsigned
