@@ -14,6 +14,7 @@ parser.add_option("-d", "--add-digests",
                   help="add manifest digests to implementations",
                   action='store', metavar='ALGORITHM')
 parser.add_option("--add-types", help="Add missing MIME-type attributes", action='store_true')
+parser.add_option("--add-sizes", help="Add missing size attributes", action='store_true')
 parser.add_option("-c", "--create", help="create file if nonexistant", action='store_true')
 parser.add_option("-e", "--edit", help="edit with $EDITOR", action='store_true')
 parser.add_option("-k", "--key", help="key to use for signing")
@@ -129,6 +130,9 @@ try:
 	if options.add_types:
 		import mimetypes
 		data = mimetypes.add_types(data)
+	if options.add_sizes:
+		import archive
+		data = archive.add_sizes(data)
 	if options.edit:
 		data = edit.edit(data)
 
