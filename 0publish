@@ -12,7 +12,10 @@ version = '0.1'
 parser = OptionParser(usage="usage: %prog [options] interface")
 parser.add_option("-d", "--add-digests", 
                   help="add manifest digests to implementations",
-                  action='store', metavar='ALGORITHM')
+                  action='store_true')
+parser.add_option("--manifest-algorithm", 
+                  help="specify algorithm to use with --add-digests (defaults to sha1new)",
+                  action='store', metavar='ALG')
 parser.add_option("--add-types", help="Add missing MIME-type attributes", action='store_true')
 parser.add_option("--add-sizes", help="Add missing size attributes", action='store_true')
 parser.add_option("--add-missing", 
@@ -97,11 +100,21 @@ try:
 	if sign_fn is signing.sign_unsigned and options.key:
 		sign_fn = signing.sign_xml
 
-        if not options.add_sizes: # must skip assert archive has size validation
+	algorithm = None
+	if options.add_digests:
+		import digest
+		algorithm = options.manifest_algorithm
+		if algorithm is None:
+			algorithm = 'sha1new'
+		from zeroinstall.zerostore import manifest
+		algorithm = manifest.get_algorithm(algorithm)
+
+	# Note: must skip size validation in some cases (because of this add-size and add-digests can't be combined)
+	if not options.add_sizes:
                 while True:
-                        # Validate the input...
+                        # Parse and validate the input...
                         try:
-                                validator.check(data, warnings = False)	# Don't warn on load AND save!
+                                feed = validator.check(data, False, algorithm)  # Don't warn on load AND save!
                                 break
                         except validator.InvalidInterface, ex:
                                 print "Invalid interface: " + str(ex)
@@ -128,12 +141,11 @@ try:
 	if options.merge:
 		import merge
 		data = merge.merge(data, options.merge)
-	if options.add_digests:
-		import digest
-		data = digest.add_digests(data, alg = options.add_digests)
 	if options.add_types:
 		import mimetypes
 		data = mimetypes.add_types(data)
+	if options.add_digests:
+		data = digest.add_digests(data, feed)
 	if options.add_sizes:
 		import archive
 		data = archive.add_sizes(data)
@@ -141,7 +153,7 @@ try:
 		import digest
 		import mimetypes
 		import archive
-		data = digest.add_digests(data, alg = options.add_digests)
+		data = digest.add_digests(data, feed)
 		data = mimetypes.add_types(data)
 		data = archive.add_sizes(data)
 	if options.edit:
