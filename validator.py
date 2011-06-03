@@ -1,5 +1,5 @@
 import os
-from zeroinstall.injector import model, namespaces
+from zeroinstall.injector import namespaces
 from zeroinstall.injector.reader import InvalidInterface, load_feed
 from xml.dom import minidom, Node, XMLNS_NAMESPACE
 import tempfile
@@ -62,7 +62,7 @@ def checkElement(elem):
 		if child.nodeType == Node.ELEMENT_NODE:
 			checkElement(child)
 
-def check(data, warnings = True, implementation_id_alg=None):
+def check(data, warnings = True, implementation_id_alg=None, generate_sizes=False):
 	fd, tmp_name = tempfile.mkstemp(prefix = '0publish-validate-')
 	os.close(fd)
 	try:
@@ -70,7 +70,7 @@ def check(data, warnings = True, implementation_id_alg=None):
 		tmp_file.write(data)
 		tmp_file.close()
 		try:
-			feed = load_feed(tmp_name, local=True, implementation_id_alg=implementation_id_alg)
+			feed = load_feed(tmp_name, local=True, implementation_id_alg=implementation_id_alg, generate_sizes=generate_sizes)
 		except InvalidInterface, ex:
 			raise
 		except Exception, ex:

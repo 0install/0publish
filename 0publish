@@ -109,23 +109,21 @@ try:
 		from zeroinstall.zerostore import manifest
 		algorithm = manifest.get_algorithm(algorithm)
 
-	# Note: must skip size validation in some cases (because of this add-size and add-digests can't be combined)
-	if not options.add_sizes:
-                while True:
-                        # Parse and validate the input...
-                        try:
-                                feed = validator.check(data, False, algorithm)  # Don't warn on load AND save!
-                                break
-                        except validator.InvalidInterface, ex:
-                                print "Invalid interface: " + str(ex)
+	while True:
+		# Parse and validate the input...
+		try:
+			feed = validator.check(data, False, algorithm, options.add_sizes)  # Don't warn on load AND save!
+			break
+		except validator.InvalidInterface, ex:
+			print "Invalid interface: " + str(ex)
 
-                        while True:
-                                ans = raw_input("Interface is invalid. (E)dit or (A)bort?").lower()
-                                if ans in ('e', 'edit'):
-                                        data = edit.edit(data)
-                                        options.edit = False	# Don't edit twice
-                                        break
-                                if ans in ('a', 'abort'): sys.exit(1)
+		while True:
+			ans = raw_input("Interface is invalid. (E)dit or (A)bort?").lower()
+			if ans in ('e', 'edit'):
+				data = edit.edit(data)
+				options.edit = False	# Don't edit twice
+				break
+			if ans in ('a', 'abort'): sys.exit(1)
 
 	# Process it...
 	if options.sign:
@@ -148,14 +146,14 @@ try:
 		data = digest.add_digests(data, feed)
 	if options.add_sizes:
 		import archive
-		data = archive.add_sizes(data)
+		data = archive.add_sizes(data, feed)
 	if options.add_missing:
 		import digest
 		import mimetypes
 		import archive
 		data = digest.add_digests(data, feed)
 		data = mimetypes.add_types(data)
-		data = archive.add_sizes(data)
+		data = archive.add_sizes(data, feed)
 	if options.edit:
 		data = edit.edit(data)
 
