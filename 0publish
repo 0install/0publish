@@ -100,8 +100,12 @@ try:
 	if sign_fn is signing.sign_unsigned and options.key:
 		sign_fn = signing.sign_xml
 
+	add_digests = options.add_digests or options.add_missing
+	add_sizes = options.add_sizes or options.add_missing
+	add_types = options.add_types or options.add_missing
+
 	algorithm = None
-	if options.add_digests:
+	if add_digests:
 		import digest
 		algorithm = options.manifest_algorithm
 		if algorithm is None:
@@ -112,7 +116,7 @@ try:
 	while True:
 		# Parse and validate the input...
 		try:
-			feed = validator.check(data, False, algorithm, options.add_sizes)  # Don't warn on load AND save!
+			feed = validator.check(data, False, algorithm, add_sizes)  # Don't warn on load AND save!
 			break
 		except validator.InvalidInterface, ex:
 			print "Invalid interface: " + str(ex)
@@ -139,20 +143,13 @@ try:
 	if options.merge:
 		import merge
 		data = merge.merge(data, options.merge)
-	if options.add_types:
+	if add_types:
 		import mimetypes
 		data = mimetypes.add_types(data)
-	if options.add_digests:
+	if add_digests:
 		data = digest.add_digests(data, feed)
-	if options.add_sizes:
+	if add_sizes:
 		import archive
-		data = archive.add_sizes(data, feed)
-	if options.add_missing:
-		import digest
-		import mimetypes
-		import archive
-		data = digest.add_digests(data, feed)
-		data = mimetypes.add_types(data)
 		data = archive.add_sizes(data, feed)
 	if options.edit:
 		data = edit.edit(data)
