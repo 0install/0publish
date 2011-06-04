@@ -36,6 +36,7 @@
       </runner>
     </command>
     <requires interface="http://0install.net/2007/interfaces/ZeroInstall.xml">
+      <version not-before='1.0-post'/>
       <environment insert="" mode="prepend" name="PYTHONPATH"/>
     </requires>
     <implementation id="." version="0.1-post"/>
