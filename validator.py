@@ -29,10 +29,12 @@ known_elements = {
 	'archive' : ['href', 'size', 'extract', 'type', 'start-offset'],
 	'recipe' : [],
 	'requires' : ['interface', 'use'],
-	'runner' : ['interface', 'use'],
+	'runner' : ['interface', 'use', 'command'],
 	'version' : ['not-before', 'before'],
 	'environment' : ['name', 'insert', 'value', 'default', 'mode'],
-	'overlay' : ['src', 'mount-point'],
+	'executable-in-var' : ['name', 'command'],
+	'executable-in-path' : ['name', 'command'],
+	#'overlay' : ['src', 'mount-point'],
 }
 
 def checkElement(elem):
