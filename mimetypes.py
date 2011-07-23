@@ -17,7 +17,7 @@ def add_types(data):
 		if not type:
 			if href.endswith('.tar.bz2'):
 				type = "application/x-bzip-compressed-tar"
-			elif href.endswith('.tgz'):
+			elif href.endswith('.tgz') or href.endswith('.tar.gz'):
 				type = "application/x-compressed-tar"
 			else:
 				raise Exception("Can't guess type for " + href)
