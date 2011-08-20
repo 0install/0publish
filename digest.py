@@ -61,21 +61,20 @@ def add_digest(impl, alg_name):
 
 	return True
 
-def add_digests(data, alg = None):
-	doc = minidom.parseString(data)
-
-	if alg is None:
-		alg = 'sha1new'
-	
-	changed = False
-	for impl in doc.documentElement.getElementsByTagNameNS(namespaces.XMLNS_IFACE, 'implementation'):
-		if impl.getAttribute('id') in "./":
-			continue		# Local implementation
-
-		if add_digest(impl, alg):
-			changed = True
-
-	if changed:
-		return doc.toxml()
-	else:
+def add_digests(data, feed):
+	changed_implementations = feed.changed_implementations
+	if not changed_implementations:
 		return data
+
+	def is_digest(id):
+		return id is not None and '=' in id
+
+	doc = minidom.parseString(data)
+	implementations = doc.documentElement.getElementsByTagNameNS(namespaces.XMLNS_IFACE, 'implementation')
+	idless_implementations = [impl for impl in implementations if not is_digest(impl.getAttribute('id'))]
+
+	for dom_implementation, feed_implementation in zip(idless_implementations, changed_implementations):
+		dom_implementation.setAttribute('id', feed_implementation.id)
+
+	return doc.toxml()
+

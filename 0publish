@@ -7,34 +7,28 @@ import signing
 from logging import info, debug
 import edit, validator, create
 
-version = '0.20'
+version = '0.1'
 
 parser = OptionParser(usage="usage: %prog [options] interface")
-parser.add_option("-a", "--add-from", help="add implementations from FEED", metavar='FEED')
-parser.add_option("--add-types", help="add missing MIME-type attributes", action='store_true')
-parser.add_option("--add-version", help="add a new implementation", action='store', metavar='VERSION')
-parser.add_option("--archive-url", help="add archive at this URL", action='store', metavar='URL')
-parser.add_option("--archive-file", help="local copy of archive-url", action='store', metavar='FILE')
-parser.add_option("--archive-extract", help="subdirectory of archive to extract", action='store', metavar='DIR')
+parser.add_option("-d", "--add-digests", 
+                  help="add manifest digests to implementations",
+                  action='store_true')
+parser.add_option("--manifest-algorithm", 
+                  help="specify algorithm to use with --add-digests (defaults to sha1new)",
+                  action='store', metavar='ALG')
+parser.add_option("--add-types", help="Add missing MIME-type attributes", action='store_true')
+parser.add_option("--add-sizes", help="Add missing size attributes", action='store_true')
+parser.add_option("--add-missing", 
+                  help="Equivalent to --add-digests --add-types --add-sizes", 
+                  action='store_true', metavar='ALGORITHM')
 parser.add_option("-c", "--create", help="create file if nonexistant", action='store_true')
-parser.add_option("-d", "--add-digest", help="add extra digests", action='store', metavar='ALG')
 parser.add_option("-e", "--edit", help="edit with $EDITOR", action='store_true')
-parser.add_option("-g", "--gpgsign", help="add a GPG signature block", action='store_true')
 parser.add_option("-k", "--key", help="key to use for signing")
-parser.add_option("-l", "--local", help="deprecated; use --add-from instead", dest='add_from', metavar='LOCAL')
-parser.add_option("--manifest-algorithm", help="select algorithm for manifests", action='append', metavar='ALG')
-parser.add_option("--set-interface-uri", help="set interface URI", action='store', metavar='URI')
-parser.add_option("--set-id", help="set implementation ID", action='store', metavar='DIGEST')
-parser.add_option("--set-main", help="set main executable", action='store', metavar='EXEC')
-parser.add_option("--set-arch", help="set architecture", action='store', metavar='ARCH')
-parser.add_option("--set-released", help="set release date", action='store', metavar='DATE')
-parser.add_option("--set-stability", help="set stability", action='store', metavar='STABILITY')
-parser.add_option("--set-version", help="set version number", action='store', metavar='VERSION')
-parser.add_option("-s", "--stable", help="mark testing version stable", action='store_true')
-parser.add_option("", "--select-version", help="select version to use in --set-* commands", action='store', metavar='VERSION')
-parser.add_option("-x", "--xmlsign", help="add an XML signature block", action='store_true')
-parser.add_option("-u", "--unsign", help="remove any signature", action='store_true')
-parser.add_option("-v", "--verbose", help="more verbose output", action='count')
+parser.add_option("-m", "--merge", help="Merge FEED with given feed", metavar='FEED')
+parser.add_option("-s", "--stable", help="Mark the last version stable", action='store_true')
+parser.add_option("-x", "--sign", help="Add an XML signature block", action='store_true')
+parser.add_option("-u", "--unsign", help="Remove any signature", action='store_true')
+parser.add_option("-v", "--verbose", help="More verbose output", action='count')
 parser.add_option("-V", "--version", help="display version information", action='store_true')
 
 (options, args) = parser.parse_args()
@@ -76,15 +70,16 @@ try:
 	if os.path.exists(interface):
 		contents = file(interface).read()
 		data, sign_fn, key = signing.check_signature(interface)
-	elif options.add_from:
-		if os.path.exists(options.add_from):
-			data = create.create_from_local(options.add_from)
+	elif options.merge:
+		if os.path.exists(options.merge):
+			data = create.create_from_local(options.merge)
 			sign_fn = signing.sign_unsigned
 			key = None
 			force_save = True
-			options.add_from = False
+			options.merge = False
 		else:
-			raise Exception("File '%s' does not exist." % options.add_from)
+			raise Exception("File '%s' does not exist." %
+                   options.merge)
 	else:
 		if options.create or confirm("Interface file '%s' does not exist. Create it?" % interface):
 			data = create.create(interface)
@@ -105,10 +100,23 @@ try:
 	if sign_fn is signing.sign_unsigned and options.key:
 		sign_fn = signing.sign_xml
 
+	add_digests = options.add_digests or options.add_missing
+	add_sizes = options.add_sizes or options.add_missing
+	add_types = options.add_types or options.add_missing
+
+	algorithm = None
+	if add_digests:
+		import digest
+		algorithm = options.manifest_algorithm
+		if algorithm is None:
+			algorithm = 'sha1new'
+		from zeroinstall.zerostore import manifest
+		algorithm = manifest.get_algorithm(algorithm)
+
 	while True:
-		# Validate the input...
+		# Parse and validate the input...
 		try:
-			validator.check(data, warnings = False)	# Don't warn on load AND save!
+			feed = validator.check(data, False, algorithm, add_sizes)  # Don't warn on load AND save!
 			break
 		except validator.InvalidInterface, ex:
 			print "Invalid interface: " + str(ex)
@@ -122,55 +130,27 @@ try:
 			if ans in ('a', 'abort'): sys.exit(1)
 
 	# Process it...
-	if options.xmlsign:
+	if options.sign:
 		sign_fn = signing.sign_xml
 	if options.unsign:
 		sign_fn = signing.sign_unsigned
-	if options.gpgsign:
-		sign_fn = signing.sign_plain
 	if options.key:
 		print "Changing key from '%s' to '%s'" % (key, options.key)
 		key = options.key
-	if options.set_interface_uri:
-		import release
-		data = release.set_interface_uri(data, options.set_interface_uri)
-	if options.add_version:
-		import release
-		data = release.add_version(data, options.add_version)
-	if options.set_id or options.set_version or options.set_released or \
-	   options.set_stability or options.set_arch or options.set_main:
-		import release
-		data = release.set_attributes(data, options.select_version,
-					id = options.set_id,
-					version = options.set_version,
-					released = options.set_released,
-					stability = options.set_stability,
-					main = options.set_main,
-					arch = options.set_arch)
 	if options.stable:
-		assert not options.select_version, "Use --set-stability=stable --select-version=... instead"
 		import stable
 		data = stable.mark_stable(data)
-	if options.archive_url:
-		import archive
-		algs = options.manifest_algorithm
-		if algs is None:
-			algs = ['sha1new']
-			import hashlib
-			if hasattr(hashlib, 'sha256'):
-				algs.append('sha256')
-		data = archive.add_archive(data, options.archive_url, options.archive_file, options.archive_extract, algs)
-	elif options.archive_file or options.archive_extract:
-		raise Exception('Must use --archive-uri option')
-	if options.add_from:
+	if options.merge:
 		import merge
-		data = merge.merge(data, options.add_from)
-	if options.add_digest:
-		import digest
-		data = digest.add_digests(data, alg = options.add_digest)
-	if options.add_types:
+		data = merge.merge(data, options.merge)
+	if add_types:
 		import mimetypes
 		data = mimetypes.add_types(data)
+	if add_digests:
+		data = digest.add_digests(data, feed)
+	if add_sizes:
+		import archive
+		data = archive.add_sizes(data, feed)
 	if options.edit:
 		data = edit.edit(data)
 

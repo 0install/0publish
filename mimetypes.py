@@ -1,10 +1,5 @@
 from xml.dom import minidom
 from zeroinstall.injector import namespaces
-from zeroinstall.zerostore import manifest, Stores, NotStored
-import xmltools
-from logging import info
-
-stores = Stores()
 
 def add_types(data):
 	doc = minidom.parseString(data)

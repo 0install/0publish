@@ -1,6 +1,6 @@
 import os
-from zeroinstall.injector import model, namespaces
-from zeroinstall.injector.reader import InvalidInterface, update
+from zeroinstall.injector import namespaces
+from zeroinstall.injector.reader import InvalidInterface, load_feed
 from xml.dom import minidom, Node, XMLNS_NAMESPACE
 import tempfile
 from logging import warn, info
@@ -64,16 +64,15 @@ def checkElement(elem):
 		if child.nodeType == Node.ELEMENT_NODE:
 			checkElement(child)
 
-def check(data, warnings = True):
+def check(data, warnings = True, implementation_id_alg=None, generate_sizes=False):
 	fd, tmp_name = tempfile.mkstemp(prefix = '0publish-validate-')
 	os.close(fd)
-	tmp_iface = model.Interface(tmp_name)
 	try:
 		tmp_file = file(tmp_name, 'w')
 		tmp_file.write(data)
 		tmp_file.close()
 		try:
-			update(tmp_iface, tmp_name, local = True)
+			feed = load_feed(tmp_name, local=True, implementation_id_alg=implementation_id_alg, generate_sizes=generate_sizes)
 		except InvalidInterface, ex:
 			raise
 		except Exception, ex:
@@ -85,3 +84,5 @@ def check(data, warnings = True):
 	if warnings:
 		doc = minidom.parseString(data)
 		checkElement(doc.documentElement)
+
+	return feed
