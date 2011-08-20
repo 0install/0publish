@@ -30,15 +30,18 @@
         <version before="3"/>
       </runner>
     </command>
+
     <command name="test" path="tests/testall.py">
       <runner interface="http://repo.roscidus.com/python/python">
         <version before="3"/>
       </runner>
     </command>
+
     <requires interface="http://0install.net/2007/interfaces/ZeroInstall.xml">
-      <version not-before='1.0-post'/>
+      <version not-before='1.2-post'/>
       <environment insert="" mode="prepend" name="PYTHONPATH"/>
     </requires>
-    <implementation id="." version="0.1-post"/>
+
+    <implementation id="." version="1.0-post"/>
   </group>
 </interface>
