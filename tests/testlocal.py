@@ -39,6 +39,7 @@ def parse(xml):
 local_file = os.path.join(os.path.dirname(__file__), 'local.xml')
 local_file_req = os.path.join(os.path.dirname(__file__), 'local-req.xml')
 local_file_command = os.path.join(os.path.dirname(__file__), 'local-command.xml')
+local_file_zi13 = os.path.join(os.path.dirname(__file__), 'zeroinstall-injector-1.3.xml')
 
 def tap(s):
 	#print s
@@ -222,6 +223,26 @@ class TestLocal(unittest.TestCase):
 		assert len(new_root.getElementsByTagNameNS(XMLNS_IFACE, 'requires')) == 1
 		assert len(new_root.getElementsByTagNameNS(XMLNS_IFACE, 'command')) == 1
 	
+	def testMerge2(self):
+		master_xml = merge.merge(header + """
+  <group license="OSI Approved :: GNU Lesser General Public License (LGPL)" main="0launch">
+    <command name="run" path="0launch">
+      <runner interface="http://repo.roscidus.com/python/python">
+	<version before="3"/>
+      </runner>
+    </command>
+
+    <group>
+      <command name="run" path="0launch"/>
+      <implementation id="sha1new=7d1ecfbd76a42d56f029f9d0c72e4ac26c8561de" released="2011-07-23" version="1.2"/>
+    </group>
+  </group>
+  """ + footer, local_file_zi13)
+		doc = minidom.parseString(master_xml)
+
+		n_groups = len(doc.getElementsByTagName("group"))
+		assert n_groups == 2
+
 	def testLocalContext(self):
 		def get_context(xml_frag):
 			doc = minidom.parseString(header + xml_frag + footer)

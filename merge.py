@@ -30,7 +30,10 @@ class Context:
 				for x in childNodes(node, XMLNS_IFACE, 'requires'):
 					self.requires.append(x)
 				for x in childNodes(node, XMLNS_IFACE, 'command'):
-					self.commands[x.getAttribute('name')] = x
+					command_name = x.getAttribute('name')
+					if command_name not in self.commands:
+						self.commands[command_name] = x
+					# (else the existing definition on the child should be used)
 			node = node.parentNode
 			if node.nodeName != 'group':
 				break
@@ -86,16 +89,20 @@ def score_subset(group, impl):
 		if key not in impl.attribs.keys():
 			#print "BAD", key
 			return (0,)		# Group sets an attribute the impl doesn't want
+	matching_commands = 0
 	for name, g_command in group.commands.iteritems():
 		if name not in impl.commands:
 			return (0,)		# Group sets a command the impl doesn't want
+		if nodesEqual(g_command, impl.commands[name]):
+			# Prefer matching commands to overriding them
+			matching_commands += 1
 	for g_req in group.requires:
 		for i_req in impl.requires:
 			if nodesEqual(g_req, i_req): break
 		else:
 			return (0,)		# Group adds a requires that the impl doesn't want
 	# Score result so we get groups that have all the same requires/commands first, then ones with all the same attribs
-	return (1, len(group.requires) + len(group.commands), len(group.attribs))
+	return (1, len(group.requires) + len(group.commands), len(group.attribs) + matching_commands)
 
 # Note: the namespace stuff isn't quite right yet.
 # Might get conflicts if both documents use the same prefix for different things.
