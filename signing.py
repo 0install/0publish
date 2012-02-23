@@ -63,14 +63,6 @@ def run_gpg(default_key, *arguments):
 def sign_unsigned(path, data, key):
 	os.rename(write_tmp(path, data), path)
 
-def sign_plain(path, data, key):
-	tmp = write_tmp(path, data)
-	try:
-		run_gpg(key, '--clearsign', tmp)
-	finally:
-		os.unlink(tmp)
-	os.rename(tmp + '.asc', path)
-
 def sign_xml(path, data, key):
 	tmp = write_tmp(path, data)
 	sigtmp = tmp + '.sig'
