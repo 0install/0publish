@@ -18,6 +18,7 @@ known_elements = {
 	'icon' : ['type', 'href'],
 	'feed' : ['src', 'arch'],
 	'feed-for' : ['interface'],
+	'replaced-by' : ['interface'],
 
 	'group' : group_impl_attribs,
 	'implementation' : ['id'] + group_impl_attribs,
