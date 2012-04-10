@@ -117,4 +117,4 @@ def add_archive(data, url, local_file, extract, algs):
 		name, value = x.split('=')
 		digest_element.setAttribute(name, value)
 
-	return doc.toxml()
+	return doc.toxml('utf-8')

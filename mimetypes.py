@@ -25,6 +25,6 @@ def add_types(data):
 			changed = True
 
 	if changed:
-		return doc.toxml()
+		return doc.toxml('utf-8')
 	else:
 		return data

@@ -97,4 +97,4 @@ def create_from_local(local):
 	root.appendChild(doc.createTextNode('\n'))
 
 	# minidom's writer loses the newline after the PI
-	return xml_header + root.toxml()
+	return xml_header + root.toxml('utf-8')

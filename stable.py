@@ -23,7 +23,7 @@ def mark_stable(data):
 	for impl in latest_testing:
 		impl.setAttribute('stability', 'stable')
 	
-	return doc.toxml()
+	return doc.toxml('utf-8')
 
 def get_stability(x):
 	root = x.ownerDocument.documentElement

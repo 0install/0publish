@@ -171,4 +171,4 @@ def merge(data, local):
 
 		xmltools.insert_element(new_impl, group)
 
-	return master_doc.toxml()
+	return master_doc.toxml('utf-8')

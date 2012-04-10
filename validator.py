@@ -1,4 +1,4 @@
-import os
+import os, io
 from zeroinstall.injector import model, namespaces
 from zeroinstall.injector.reader import InvalidInterface, update
 from xml.dom import minidom, Node, XMLNS_NAMESPACE
@@ -66,13 +66,13 @@ def checkElement(elem):
 			checkElement(child)
 
 def check(data, warnings = True):
+	assert type(data) == bytes, type(data)	# (must not be unicode)
 	fd, tmp_name = tempfile.mkstemp(prefix = '0publish-validate-')
 	os.close(fd)
 	tmp_iface = model.Interface(tmp_name)
 	try:
-		tmp_file = file(tmp_name, 'w')
-		tmp_file.write(data)
-		tmp_file.close()
+		with io.open(tmp_name, 'wb') as stream:
+			stream.write(data)
 		try:
 			update(tmp_iface, tmp_name, local = True)
 		except InvalidInterface, ex:

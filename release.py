@@ -8,7 +8,7 @@ def set_interface_uri(data, uri):
 	"""Set the uri attribute on the root element."""
 	doc = minidom.parseString(data)
 	doc.documentElement.setAttribute('uri', uri)
-	return doc.toxml()
+	return doc.toxml('utf-8')
 
 def add_version(data, version):
 	"""Create a new <implementation> after the last one in the file."""
@@ -30,7 +30,7 @@ def add_version(data, version):
 	if previous and previous.nodeType == Node.TEXT_NODE:
 		parent.insertBefore(doc.createTextNode(previous.nodeValue), next)
 	parent.insertBefore(new_impl, next)
-	return doc.toxml()
+	return doc.toxml('utf-8')
 
 def set_attributes(data, selected_version, id = None, version = None, released = None, stability = None, main = None, arch = None):
 	"""Normally there's only one implementation, but we can cope with several."""
@@ -90,4 +90,4 @@ def set_attributes(data, selected_version, id = None, version = None, released =
 		if x.hasAttribute('version-modifier'):
 			x.removeAttribute('version-modifier')
 	
-	return doc.toxml()
+	return doc.toxml('utf-8')
