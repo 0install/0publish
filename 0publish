@@ -158,7 +158,7 @@ try:
 				algs.append('sha256')
 		data = archive.add_archive(data, options.archive_url, options.archive_file, options.archive_extract, algs)
 	elif options.archive_file or options.archive_extract:
-		raise Exception('Must use --archive-uri option')
+		raise Exception('Must use --archive-url option')
 	if options.add_from:
 		import merge
 		data = merge.merge(data, options.add_from)
