@@ -5,6 +5,7 @@ for x in ['LANGUAGE', 'LANG']:
 		del os.environ[x]
 try:
 	import coverage
+	coverage.use_cache(False)
 	coverage.erase()
 	coverage.start()
 except ImportError:
