@@ -76,6 +76,10 @@ def add_archive(data, url, local_file, extract, algs):
 
 		archive_id = manifest_for_dir(extracted, algs[0])
 		extra_digests = set([manifest_for_dir(extracted, a) for a in algs[1:]])
+
+		if '=' not in archive_id:
+			# New-style digests can't go in the ID
+			extra_digests.add(archive_id)
 	finally:
 		ro_rmtree(tmpdir)
 
@@ -114,7 +118,13 @@ def add_archive(data, url, local_file, extract, algs):
 		digest_element = doc.createElementNS(namespaces.XMLNS_IFACE, 'manifest-digest')
 		xmltools.insert_before(digest_element, archive)
 	for x in extra_digests - set([digest.digests(impl)]):
-		name, value = x.split('=')
+		for old_alg in ['sha1=', 'sha1new=', 'sha256=']:
+			if x.startswith(old_alg):
+				name, value = x.split('=')
+				break
+		else:
+			assert '_' in x, "Invalid digest %s" % x
+			name, value = x.split('_')
 		digest_element.setAttribute(name, value)
 
 	return doc.toxml('utf-8')

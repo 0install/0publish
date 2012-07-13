@@ -23,7 +23,7 @@ known_elements = {
 	'group' : group_impl_attribs,
 	'implementation' : ['id'] + group_impl_attribs,
 	'package-implementation' : ['package', 'main', 'distributions'],
-	'manifest-digest' : ['sha1new', 'sha256'],
+	'manifest-digest' : ['sha1new', 'sha256', 'sha256new'],
 	'command' : ['name', 'path', 'shell-command'],
 	'arg' : [],
 
