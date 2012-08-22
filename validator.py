@@ -38,6 +38,11 @@ known_elements = {
 	#'overlay' : ['src', 'mount-point'],
 }
 
+known_distros = frozenset([
+	"Windows", "Darwin", "Debian", "RPM", "Slack",
+	"Arch", "Gentoo", "Ports", "MacPorts", "Cygwin"
+])
+
 def checkElement(elem):
 	if elem.namespaceURI != namespaces.XMLNS_IFACE:
 		info("Note: Skipping unknown (but namespaced) element <%s>", elem.localName)
@@ -60,6 +65,14 @@ def checkElement(elem):
 		if name not in known_attrs:
 			warn("Unknown Zero Install attribute '%s' on <%s>.\nNon Zero-Install attributes should be namespaced.",
 					name, elem.localName)
+
+		if name == 'distributions':
+			if ',' in value:
+				warn("Use ' ' to separate distribution names, not ',' (%s)", value)
+			else:
+				for distro in value.split(' '):
+					if distro not in known_distros:
+						warn("Unknown distribution name '%s' (expected one of %s)", distro, '|'.join(known_distros))
 		
 	for child in elem.childNodes:
 		if child.nodeType == Node.ELEMENT_NODE:
