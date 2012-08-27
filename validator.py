@@ -1,5 +1,5 @@
-import os, io
-from zeroinstall.injector import model, namespaces
+import os, io, StringIO
+from zeroinstall.injector import model, namespaces, qdom
 from zeroinstall.injector.reader import InvalidInterface, update
 from xml.dom import minidom, Node, XMLNS_NAMESPACE
 import tempfile
@@ -80,22 +80,19 @@ def checkElement(elem):
 
 def check(data, warnings = True):
 	assert type(data) == bytes, type(data)	# (must not be unicode)
-	fd, tmp_name = tempfile.mkstemp(prefix = '0publish-validate-')
-	os.close(fd)
-	tmp_iface = model.Interface(tmp_name)
+
 	try:
-		with io.open(tmp_name, 'wb') as stream:
-			stream.write(data)
-		try:
-			update(tmp_iface, tmp_name, local = True)
-		except InvalidInterface, ex:
-			raise
-		except Exception, ex:
-			warn("Internal error: %s", ex)
-			raise InvalidInterface(str(ex))
-	finally:
-		os.unlink(tmp_name)
+		doc = minidom.parseString(data)
+		if doc.documentElement.getAttribute('uri'):
+			local_path = None
+		else:
+			local_path = '/tmp/local.xml'
+		model.ZeroInstallFeed(qdom.parse(StringIO.StringIO(data)), local_path = local_path)
+	except InvalidInterface, ex:
+		raise
+	except Exception, ex:
+		warn("Internal error: %s", ex)
+		raise InvalidInterface(str(ex))
 	
 	if warnings:
-		doc = minidom.parseString(data)
 		checkElement(doc.documentElement)

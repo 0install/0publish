@@ -1,7 +1,7 @@
 import os
 from xml.dom import minidom, Node
 from zeroinstall.injector.namespaces import XMLNS_IFACE
-from zeroinstall.injector import model, reader
+from zeroinstall.injector import model, reader, qdom
 
 # minidom loses the newline after the stylesheet declaration, so we
 # just serialise the body and glue this on the front manually...
@@ -78,13 +78,14 @@ def remove_with_preceding_comments(element):
 		root.removeChild(x)
 
 def create_from_local(local):
-	iface = model.Interface(os.path.abspath(local))
-	reader.update(iface, local, local = True)
-	if not iface.feed_for:
+	path = os.path.abspath(local)
+	with open(path, 'rb') as stream:
+		feed = model.ZeroInstallFeed(qdom.parse(stream), local_path = path)
+	if not feed.feed_for:
 		raise Exception("No <feed-for> in '%s'; can't use it as a local feed." % local)
-	if len(iface.feed_for) != 1:
+	if len(feed.feed_for) != 1:
 		raise Exception("Multiple <feed-for> elements. Not supported, sorry!")
-	uri = iface.feed_for.keys()[0]
+	uri = list(feed.feed_for)[0]
 
 	doc = minidom.parse(local)
 	root = doc.documentElement

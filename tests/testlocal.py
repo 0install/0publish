@@ -22,19 +22,8 @@ footer = """
 """
 
 def parse(xml):
-	dom = minidom.parseString(xml)
-	uri = dom.documentElement.getAttribute('uri')
-	assert uri
-
-	tmp = tempfile.NamedTemporaryFile(prefix = 'test-')
-	try:
-		tmp.write(xml)
-		tmp.flush()
-		iface = model.Interface(uri)
-		reader.update(iface, tmp.name, local = True)
-		return iface
-	finally:
-		tmp.close()
+	stream = StringIO.StringIO(xml)
+	return model.ZeroInstallFeed(qdom.parse(stream))
 
 local_file = os.path.join(os.path.dirname(__file__), 'local.xml')
 local_file_req = os.path.join(os.path.dirname(__file__), 'local-req.xml')
@@ -48,28 +37,28 @@ def tap(s):
 class TestLocal(unittest.TestCase):
 	def testCreate(self):
 		master = parse(create.create_from_local(local_file))
-		assert master.uri == 'http://test/hello.xml', master
+		assert master.url == 'http://test/hello.xml', master
 		assert len(master.implementations) == 1
 	
 	def testMergeFirst(self):
 		master = parse(merge.merge(header + footer, local_file))
-		assert master.uri == 'http://test/hello.xml', master
+		assert master.url == 'http://test/hello.xml', master
 		assert len(master.implementations) == 1
 
 	def testMergeSecond(self):
 		master = parse(merge.merge(header + "<implementation id='sha1=123' version='1'/>" + footer, local_file))
-		assert master.uri == 'http://test/hello.xml', master
+		assert master.url == 'http://test/hello.xml', master
 		assert len(master.implementations) == 2
 
 	def testMergeGroup(self):
 		master = parse(merge.merge(header + "<group>\n    <implementation id='sha1=123' version='1'/>\n  </group>" + footer, local_file))
-		assert master.uri == 'http://test/hello.xml', master
+		assert master.url == 'http://test/hello.xml', master
 		assert len(master.implementations) == 2
 		assert master.implementations['sha1=002'].requires == []
 
 	def testMergeLocalReq(self):
 		master = parse(tap(merge.merge(header + "<group x='x'>\n    <implementation id='sha1=123' version='1'/>\n  </group>" + footer, local_file_req)))
-		assert master.uri == 'http://test/hello.xml', master
+		assert master.url == 'http://test/hello.xml', master
 		assert len(master.implementations) == 2
 		deps = master.implementations['sha1=003'].requires
 		assert len(deps) == 1
@@ -79,7 +68,7 @@ class TestLocal(unittest.TestCase):
 
 	def testNotSubset(self):
 		master = parse(merge.merge(header + "<group a='a'>\n    <implementation id='sha1=123' version='1'/>\n  </group>" + footer, local_file))
-		assert master.uri == 'http://test/hello.xml', master
+		assert master.url == 'http://test/hello.xml', master
 		assert len(master.implementations) == 2
 		assert master.implementations['sha1=123'].metadata.get('a', None) == 'a'
 		assert master.implementations['sha1=002'].metadata.get('a', None) == None
@@ -113,7 +102,7 @@ class TestLocal(unittest.TestCase):
     <implementation id='sha1=002' version='2'/>
   </group>""" + footer, local_file_req)
 		master = parse(master_xml)
-		assert master.uri == 'http://test/hello.xml', master
+		assert master.url == 'http://test/hello.xml', master
 		assert len(master.implementations) == 3
 		deps = master.implementations['sha1=003'].requires
 		assert len(deps) == 1
@@ -131,7 +120,7 @@ class TestLocal(unittest.TestCase):
     <implementation id='sha1=123' version='1'/>
   </group>""" + footer, local_file_req)
 		master = parse(master_xml)
-		assert master.uri == 'http://test/hello.xml', master
+		assert master.url == 'http://test/hello.xml', master
 		assert len(master.implementations) == 3
 		deps = master.implementations['sha1=003'].requires
 		assert len(deps) == 1
@@ -149,7 +138,7 @@ class TestLocal(unittest.TestCase):
     <implementation id='sha1=002' version='2'/>
   </group>""" + footer, local_file_command)
 		master = parse(master_xml)
-		assert master.uri == 'http://test/hello.xml', master
+		assert master.url == 'http://test/hello.xml', master
 		assert len(master.implementations) == 2
 		commands = master.implementations['sha1=003'].commands
 		assert len(commands) == 1
@@ -170,7 +159,7 @@ class TestLocal(unittest.TestCase):
     <implementation id='sha1=002' version='2'/>
   </group>""" + footer, local_file_command)
 		master = parse(master_xml)
-		assert master.uri == 'http://test/hello.xml', master
+		assert master.url == 'http://test/hello.xml', master
 		assert len(master.implementations) == 2
 		commands = master.implementations['sha1=003'].commands
 		assert len(commands) == 1
@@ -191,7 +180,7 @@ class TestLocal(unittest.TestCase):
     <implementation id='sha1=002' version='2'/>
   </group>""" + footer, local_file_command)
 		master = parse(master_xml)
-		assert master.uri == 'http://test/hello.xml', master
+		assert master.url == 'http://test/hello.xml', master
 		assert len(master.implementations) == 2
 		commands = master.implementations['sha1=003'].commands
 		assert len(commands) == 1
@@ -212,7 +201,7 @@ class TestLocal(unittest.TestCase):
     <implementation id='sha1=002' version='2'/>
   </group>""" + footer, local_file_command)
 		master = parse(master_xml)
-		assert master.uri == 'http://test/hello.xml', master
+		assert master.url == 'http://test/hello.xml', master
 		assert len(master.implementations) == 2
 		commands = master.implementations['sha1=003'].commands
 		assert len(commands) == 1

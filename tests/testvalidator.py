@@ -57,7 +57,7 @@ class TestValidator(unittest.TestCase):
 		try:
 			check(header)
 		except InvalidInterface, ex:
-			assert "Invalid XML" in str(ex), ex
+			assert "no element found" in str(ex), ex
 
 		try:
 			check(header + "<implementation/>" + footer)
