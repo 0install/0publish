@@ -29,7 +29,8 @@ known_elements = {
 
 	'archive' : ['href', 'size', 'extract', 'type', 'start-offset'],
 	'recipe' : [],
-	'requires' : ['interface', 'use', 'importance'],
+	'requires' : ['interface', 'use', 'importance', 'os'],
+	'restricts' : ['interface', 'os'],
 	'runner' : ['interface', 'use', 'importance', 'command'],
 	'version' : ['not-before', 'before'],
 	'environment' : ['name', 'insert', 'value', 'default', 'mode'],
