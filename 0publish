@@ -155,7 +155,7 @@ try:
 			algs = ['sha1new']
 			import hashlib
 			if hasattr(hashlib, 'sha256'):
-				algs.append('sha256')
+				algs.append('sha256new')
 		data = archive.add_archive(data, options.archive_url, options.archive_file, options.archive_extract, algs)
 	elif options.archive_file or options.archive_extract:
 		raise Exception('Must use --archive-url option')
