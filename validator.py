@@ -26,6 +26,7 @@ known_elements = {
 	'manifest-digest' : ['sha1new', 'sha256', 'sha256new'],
 	'command' : ['name', 'path', 'shell-command'],
 	'arg' : [],
+	'for-each' : ['item-from', 'separator'],
 
 	'archive' : ['href', 'size', 'extract', 'type', 'start-offset'],
 	'recipe' : [],
@@ -33,7 +34,7 @@ known_elements = {
 	'restricts' : ['interface', 'os', 'version'],
 	'runner' : ['interface', 'use', 'importance', 'command'],
 	'version' : ['not-before', 'before'],
-	'environment' : ['name', 'insert', 'value', 'default', 'mode'],
+	'environment' : ['name', 'insert', 'value', 'default', 'mode', 'separator'],
 	'executable-in-var' : ['name', 'command'],
 	'executable-in-path' : ['name', 'command'],
 	#'overlay' : ['src', 'mount-point'],
