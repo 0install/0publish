@@ -60,6 +60,13 @@ def checkElement(elem):
 		if uri == XMLNS_NAMESPACE:
 			continue	# Namespace declarations are fine
 
+		if name == 'if-0install-version':
+			try:
+				model.VersionExpressionRestriction(value)	# Check syntax
+			except model.SafeException as ex:
+				warn("Bad if-0install-version expression: %s", ex)
+			continue
+
 		if uri:
 			info("Note: Skipping unknown (but namespaced) attribute '%s'", name)
 			continue
