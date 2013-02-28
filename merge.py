@@ -29,6 +29,8 @@ class Context:
 				# they'll get copied over anyway
 				for x in childNodes(node, XMLNS_IFACE, 'requires'):
 					self.requires.append(x)
+				for x in childNodes(node, XMLNS_IFACE, 'restricts'):
+					self.requires.append(x)
 				for x in childNodes(node, XMLNS_IFACE, 'command'):
 					command_name = x.getAttribute('name')
 					if command_name not in self.commands:
