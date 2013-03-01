@@ -15,7 +15,7 @@ class Context:
 		doc = impl.ownerDocument
 		self.attribs = {}
 		self.requires = []
-		self.commands = {}
+		self.commands = {}		# (name, version-expr) -> <command>
 
 		node = impl
 		while True:
@@ -32,7 +32,7 @@ class Context:
 				for x in childNodes(node, XMLNS_IFACE, 'restricts'):
 					self.requires.append(x)
 				for x in childNodes(node, XMLNS_IFACE, 'command'):
-					command_name = x.getAttribute('name')
+					command_name = (x.getAttribute('name'), x.getAttribute('if-0install-version'))
 					if command_name not in self.commands:
 						self.commands[command_name] = x
 					# (else the existing definition on the child should be used)
@@ -92,10 +92,10 @@ def score_subset(group, impl):
 			#print "BAD", key
 			return (0,)		# Group sets an attribute the impl doesn't want
 	matching_commands = 0
-	for name, g_command in group.commands.iteritems():
-		if name not in impl.commands:
+	for name_expr, g_command in group.commands.iteritems():
+		if name_expr not in impl.commands:
 			return (0,)		# Group sets a command the impl doesn't want
-		if nodesEqual(g_command, impl.commands[name]):
+		if nodesEqual(g_command, impl.commands[name_expr]):
 			# Prefer matching commands to overriding them
 			matching_commands += 1
 	for g_req in group.requires:
@@ -138,8 +138,8 @@ def merge(data, local):
 		group_context = Context(group)
 
 		new_commands = []
-		for name, new_command in new_impl_context.commands.iteritems():
-			old_command = group_context.commands.get(name, None)
+		for name_expr, new_command in new_impl_context.commands.iteritems():
+			old_command = group_context.commands.get(name_expr, None)
 			if not (old_command and nodesEqual(old_command, new_command)):
 				new_commands.append(master_doc.importNode(new_command, True))
 

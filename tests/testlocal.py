@@ -27,6 +27,7 @@ def parse(xml):
 
 local_file = os.path.join(os.path.dirname(__file__), 'local.xml')
 local_file_req = os.path.join(os.path.dirname(__file__), 'local-req.xml')
+local_file_if = os.path.join(os.path.dirname(__file__), 'local-if.xml')
 local_file_command = os.path.join(os.path.dirname(__file__), 'local-command.xml')
 local_file_zi13 = os.path.join(os.path.dirname(__file__), 'zeroinstall-injector-1.3.xml')
 
@@ -231,6 +232,31 @@ class TestLocal(unittest.TestCase):
 
 		n_groups = len(doc.getElementsByTagName("group"))
 		assert n_groups == 2
+	
+	def testMergeIf0installVersion(self):
+		master_xml = merge.merge(header + """
+  <group>
+    <command name='run' path='run.sh'/>
+    <implementation id="sha1=003" version="0.4"/>
+  </group>
+  """ + footer, local_file_if)
+		doc = minidom.parseString(master_xml)
+
+		n_commands = len(doc.getElementsByTagName("command"))
+		assert n_commands == 3
+
+		# We can share the run-old.sh <command>
+		master_xml = merge.merge(header + """
+  <group>
+    <command name='run' path='run-old.sh' if-0install-version='..!2'/>
+    <command name='run' path='run-mid.sh' if-0install-version='2..'/>
+    <implementation id="sha1=003" version="0.4"/>
+  </group>
+  """ + footer, local_file_if)
+		doc = minidom.parseString(master_xml)
+
+		n_commands = len(doc.getElementsByTagName("command"))
+		assert n_commands == 3
 
 	def testLocalContext(self):
 		def get_context(xml_frag):
