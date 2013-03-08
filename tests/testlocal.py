@@ -51,6 +51,14 @@ class TestLocal(unittest.TestCase):
 		assert master.url == 'http://test/hello.xml', master
 		assert len(master.implementations) == 2
 
+	def testMergeTwice(self):
+		try:
+			once = merge.merge(header + "<implementation id='sha1=123' version='1'/>" + footer, local_file)
+			twice = merge.merge(once, local_file)
+			assert 0
+		except Exception as ex:
+			assert 'Duplicate ID' in str(ex)
+
 	def testMergeGroup(self):
 		master = parse(merge.merge(header + "<group>\n    <implementation id='sha1=123' version='1'/>\n  </group>" + footer, local_file))
 		assert master.url == 'http://test/hello.xml', master
@@ -237,7 +245,7 @@ class TestLocal(unittest.TestCase):
 		master_xml = merge.merge(header + """
   <group>
     <command name='run' path='run.sh'/>
-    <implementation id="sha1=003" version="0.4"/>
+    <implementation id="sha1=004" version="0.4"/>
   </group>
   """ + footer, local_file_if)
 		doc = minidom.parseString(master_xml)
@@ -250,7 +258,7 @@ class TestLocal(unittest.TestCase):
   <group>
     <command name='run' path='run-old.sh' if-0install-version='..!2'/>
     <command name='run' path='run-mid.sh' if-0install-version='2..'/>
-    <implementation id="sha1=003" version="0.4"/>
+    <implementation id="sha1=004" version="0.4"/>
   </group>
   """ + footer, local_file_if)
 		doc = minidom.parseString(master_xml)

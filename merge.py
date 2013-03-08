@@ -112,8 +112,20 @@ def merge(data, local):
 	local_doc = minidom.parse(local)
 	master_doc = minidom.parseString(data)
 
+	known_ids = set()
+	def check_unique(elem):
+		impl_id = impl.getAttribute("id")
+		if impl_id in known_ids:
+			raise Exception("Duplicate ID " + impl_id)
+		known_ids.add(impl_id)
+
+	for impl in find_impls(master_doc.documentElement):
+		check_unique(impl)
+
 	# Merge each implementation in the local feed in turn (normally there will only be one)
 	for impl in find_impls(local_doc.documentElement):
+		check_unique(impl)
+
 		# 1. Get the context of the implementation to add. This is:
 		#    - The set of its requirements
 		#    - The set of its commands
