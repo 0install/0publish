@@ -13,7 +13,7 @@ def childNodes(parent, namespaceURI = None, localName = None):
 class Context:
 	def __init__(self, impl):
 		doc = impl.ownerDocument
-		self.attribs = {}
+		self.attribs = {}		# (ns, localName) -> value
 		self.requires = []
 		self.commands = {}		# (name, version-expr) -> <command>
 
@@ -39,6 +39,17 @@ class Context:
 			node = node.parentNode
 			if node.nodeName != 'group':
 				break
+
+	@property
+	def has_main_and_run(self):
+		"""Checks whether we have a main and a <command name='run'>.
+		This case requires special care."""
+		for name, expr in self.commands:
+			if name == 'run':
+				break
+		else:
+			return False	# No run command
+		return (None, 'main') in self.attribs
 
 def find_impls(parent):
 	"""Return all <implementation> children, including those inside groups."""
@@ -149,14 +160,26 @@ def merge(data, local):
 		group = best_group[1]
 		group_context = Context(group)
 
+		if new_impl_context.has_main_and_run:
+			# If the existing group doesn't have the same main value then we'll need a new group. Otherwise,
+			# we're likely to override the command by having main on the implementation element.
+			current_group_main = group_context.attribs.get((None, 'main'), None)
+			need_new_group_for_main = current_group_main != new_impl_context.attribs[(None, 'main')]
+		else:
+			need_new_group_for_main = False
+
 		new_commands = []
 		for name_expr, new_command in new_impl_context.commands.iteritems():
-			old_command = group_context.commands.get(name_expr, None)
+			if need_new_group_for_main and name_expr[0] == 'run':
+				# If we're creating a new <group main='...'> then we can't inherit an existing <command name='run'/>,
+				old_command = None
+			else:
+				old_command = group_context.commands.get(name_expr, None)
 			if not (old_command and nodesEqual(old_command, new_command)):
 				new_commands.append(master_doc.importNode(new_command, True))
 
-		# If we have additional requirements, we'll need to create a subgroup and add them
-		if len(new_impl_context.requires) > len(group_context.requires) or new_commands:
+		# If we have additional requirements or commands, we'll need to create a subgroup and add them
+		if len(new_impl_context.requires) > len(group_context.requires) or new_commands or need_new_group_for_main:
 			subgroup = xmltools.create_element(group, 'group')
 			group = subgroup
 			#group_context = Context(group)
@@ -169,6 +192,12 @@ def merge(data, local):
 					xmltools.insert_element(req, group)
 			for c in new_commands:
 				xmltools.insert_element(c, group)
+
+			if need_new_group_for_main:
+				group.setAttribute('main', new_impl_context.attribs[(None, 'main')])
+				# We'll remove it from the <implementation> below, when cleaning up duplicates
+
+			group_context = Context(group)
 
 		new_impl = master_doc.importNode(impl, True)
 

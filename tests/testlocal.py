@@ -29,6 +29,7 @@ local_file = os.path.join(os.path.dirname(__file__), 'local.xml')
 local_file_req = os.path.join(os.path.dirname(__file__), 'local-req.xml')
 local_file_if = os.path.join(os.path.dirname(__file__), 'local-if.xml')
 local_file_command = os.path.join(os.path.dirname(__file__), 'local-command.xml')
+local_file_main_and_command = os.path.join(os.path.dirname(__file__), 'local-main-and-command.xml')
 local_file_zi13 = os.path.join(os.path.dirname(__file__), 'zeroinstall-injector-1.3.xml')
 
 def tap(s):
@@ -240,6 +241,35 @@ class TestLocal(unittest.TestCase):
 
 		n_groups = len(doc.getElementsByTagName("group"))
 		assert n_groups == 2
+
+	def testMergeMainAndCommand(self):
+		# Ensure the main attribute doesn't get promoted over the command
+
+		# Case 1: the group already has a suitable main and command.
+		# We simply add the new implementation to the group, without its own main.
+		master_xml = merge.merge(header + """
+  <group main='main'>
+    <command name='run' path='run.sh'/>
+    <implementation id="sha1=001" version="0.1"/>
+  </group>
+  """ + footer, local_file_main_and_command)
+		feed = parse(master_xml)
+
+		assert feed.implementations['sha1=001'].main == "run.sh"
+		assert feed.implementations['sha1=002'].main == "run.sh"
+
+		# Case 2: the group doesn't specify a main.
+		# We need to create a sub-group for it.
+		master_xml = merge.merge(header + """
+  <group>
+    <command name='run' path='run.sh'/>
+    <implementation id="sha1=001" version="0.1"/>
+  </group>
+  """ + footer, local_file_main_and_command)
+		feed = parse(master_xml)
+
+		assert feed.implementations['sha1=001'].main == "run.sh"
+		assert feed.implementations['sha1=002'].main == "run.sh"
 	
 	def testMergeIf0installVersion(self):
 		master_xml = merge.merge(header + """
