@@ -176,7 +176,7 @@ def merge(data, local):
 			else:
 				old_command = group_context.commands.get(name_expr, None)
 			if not (old_command and nodesEqual(old_command, new_command)):
-				new_commands.append(master_doc.importNode(new_command, True))
+				new_commands.append(xmltools.import_node(master_doc, new_command))
 
 		# If we have additional requirements or commands, we'll need to create a subgroup and add them
 		if len(new_impl_context.requires) > len(group_context.requires) or new_commands or need_new_group_for_main:
@@ -187,7 +187,7 @@ def merge(data, local):
 				for y in group_context.requires:
 					if nodesEqual(x, y): break
 				else:
-					req = master_doc.importNode(x, True)
+					req = xmltools.import_node(master_doc, x)
 					#print "Add", req
 					xmltools.insert_element(req, group)
 			for c in new_commands:
@@ -199,7 +199,7 @@ def merge(data, local):
 
 			group_context = Context(group)
 
-		new_impl = master_doc.importNode(impl, True)
+		new_impl = xmltools.import_node(master_doc, impl)
 
 		# Attributes might have been set on a parent group; move to the impl
 		for name in new_impl_context.attribs:

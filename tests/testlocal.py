@@ -29,6 +29,7 @@ local_file = os.path.join(os.path.dirname(__file__), 'local.xml')
 local_file_req = os.path.join(os.path.dirname(__file__), 'local-req.xml')
 local_file_if = os.path.join(os.path.dirname(__file__), 'local-if.xml')
 local_file_command = os.path.join(os.path.dirname(__file__), 'local-command.xml')
+local_file_ns = os.path.join(os.path.dirname(__file__), 'local-ns.xml')
 local_file_main_and_command = os.path.join(os.path.dirname(__file__), 'local-main-and-command.xml')
 local_file_zi13 = os.path.join(os.path.dirname(__file__), 'zeroinstall-injector-1.3.xml')
 
@@ -137,6 +138,23 @@ class TestLocal(unittest.TestCase):
 		assert deps[0].interface == 'http://foo', deps[0]
 
 		assert len(minidom.parseString(master_xml).documentElement.getElementsByTagNameNS(XMLNS_IFACE, 'group')) == 2
+
+	def testMergeNS(self):
+		master_xml = merge.merge(header + footer, local_file_ns)
+		master = parse(master_xml)
+		assert master.url == 'http://test/hello.xml', master
+		assert len(master.implementations) == 1
+		commands = master.implementations['sha1=003'].commands
+		assert len(commands) == 1
+		assert commands['run'].path == 'run.sh', commands['run'].path
+
+		new_root = minidom.parseString(master_xml).documentElement
+		assert len(new_root.getElementsByTagNameNS(XMLNS_IFACE, 'group')) == 1
+		assert len(new_root.getElementsByTagNameNS(XMLNS_IFACE, 'requires')) == 1
+		assert len(new_root.getElementsByTagNameNS(XMLNS_IFACE, 'command')) == 1
+
+		foo_test, = new_root.getElementsByTagNameNS('http://mynamespace/foo', 'test')
+		foo1_test, = new_root.getElementsByTagNameNS('http://myother/foo', 'test')
 
 	def testMergeCommand(self):
 		# We create a new group inside this one, sharing the <requires> and adding the <command>

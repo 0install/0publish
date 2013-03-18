@@ -147,6 +147,8 @@ def register_namespace(namespace, prefix = None):
 	@param prefix: suggested prefix
 	@return: the actual prefix
 	"""
+	if namespace == XMLNS_INTERFACE:
+		return None
 	existing_prefix = namespace_prefixes.get(namespace, None)
 	if existing_prefix:
 		return existing_prefix
@@ -158,7 +160,7 @@ def register_namespace(namespace, prefix = None):
 	orig_prefix = prefix
 	n = 0
 	while prefix in namespace_prefixes.values():
-		print "Prefix %s already in %s, not %s" % (prefix, namespace_prefixes, namespace)
+		#print "Prefix %s already in %s, not %s" % (prefix, namespace_prefixes, namespace)
 		n += 1
 		prefix = orig_prefix + str(n)
 	namespace_prefixes[namespace] = prefix
@@ -173,3 +175,30 @@ def add_attribute_ns(element, uri, name, value):
 		prefix = register_namespace(uri)
 		element.setAttributeNS(uri, '%s:%s' % (prefix, name), value)
 		element.ownerDocument.documentElement.setAttributeNS(XMLNS_NAMESPACE, 'xmlns:' + prefix, uri)
+
+def import_node(target_doc, source_node):
+	"""Import a node for a new document, fixing up namespace prefixes as we go."""
+	target_root = target_doc.documentElement
+
+	new_node = target_doc.importNode(source_node, True)
+	def fixup(elem):
+		elem.prefix = register_namespace(elem.namespaceURI, elem.prefix)
+		if elem.prefix:
+			elem.tagName = elem.nodeName = '%s:%s' % (elem.prefix, elem.localName)
+			target_root.setAttributeNS(XMLNS_NAMESPACE, 'xmlns:' + elem.prefix, elem.namespaceURI)
+
+		for (uri, name), value in list(elem.attributes.itemsNS()):
+			if uri == XMLNS_NAMESPACE:
+				elem.removeAttributeNS(uri, name)
+			elif uri:
+				new_prefix = register_namespace(uri)
+				target_root.setAttributeNS(XMLNS_NAMESPACE, 'xmlns:' + new_prefix, uri)
+				elem.removeAttributeNS(uri, name)
+				elem.setAttributeNS(uri, '%s:%s' % (new_prefix, name), value)
+
+		for child in elem.childNodes:
+			if child.nodeType == Node.ELEMENT_NODE:
+				fixup(child)
+
+	fixup(new_node)
+	return new_node
