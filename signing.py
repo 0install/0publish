@@ -1,4 +1,4 @@
-from zeroinstall import SafeException
+from zeroinstall import SafeException, support
 from zeroinstall.injector import gpg
 import tempfile, os, base64, sys, shutil
 import subprocess
@@ -61,7 +61,7 @@ def run_gpg(default_key, *arguments):
 		raise SafeException("Command '%s' failed" % arguments)
 
 def sign_unsigned(path, data, key):
-	os.rename(write_tmp(path, data), path)
+	support.portable_rename(write_tmp(path, data), path)
 
 def sign_xml(path, data, key):
 	tmp = write_tmp(path, data)
