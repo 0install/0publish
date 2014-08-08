@@ -38,6 +38,9 @@
     <requires interface="http://0install.net/2007/interfaces/ZeroInstall.xml">
       <environment insert="" mode="prepend" name="PYTHONPATH"/>
     </requires>
+    <requires interface="http://repo.roscidus.com/security/gnupg">
+      <environment name="PATH" insert="." />
+    </requires>
     <implementation id="." version="0.24-post"/>
   </group>
 </interface>
