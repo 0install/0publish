@@ -57,7 +57,8 @@ def run_gpg(default_key, *arguments):
 		arguments = ['--default-key', default_key] + arguments
 	arguments.insert(0, '--use-agent')
 	arguments.insert(0, 'gpg')
-	if os.spawnvp(os.P_WAIT, 'gpg', arguments):
+	import subprocess
+	if subprocess.call(arguments):
 		raise SafeException("Command '%s' failed" % arguments)
 
 def sign_unsigned(path, data, key):
