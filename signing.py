@@ -73,7 +73,7 @@ def sign_xml(path, data, key):
 	encoded = base64.encodestring(file(sigtmp).read())
 	os.unlink(sigtmp)
 	sig = "<!-- Base64 Signature\n" + encoded + "\n-->\n"
-	os.rename(write_tmp(path, data + sig), path)
+	support.portable_rename(write_tmp(path, data + sig), path)
 
 def export_key(dir, fingerprint):
 	assert fingerprint is not None
