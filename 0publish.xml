@@ -41,6 +41,6 @@
     <requires interface="http://repo.roscidus.com/security/gnupg">
       <environment insert="." name="PATH"/>
     </requires>
-    <implementation id="." released="2015-07-01" version="0.25"/>
+    <implementation id="." version="0.25-post"/>
   </group>
 </interface>
