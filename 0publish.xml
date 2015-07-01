@@ -1,5 +1,4 @@
 <?xml version="1.0" ?>
-<?xml-stylesheet type='text/xsl' href='interface.xsl'?>
 <interface xmlns="http://zero-install.sourceforge.net/2004/injector/interface">
   <name>0publish</name>
   <summary>utility to make creating injector interfaces easier</summary>
@@ -24,7 +23,7 @@
 
   <feed-for interface="http://0install.net/2006/interfaces/0publish"/>
 
-  <group main="0publish">
+  <group license="OSI Approved :: GNU Lesser General Public License (LGPL)" main="0publish">
     <command name="run" path="0publish">
       <runner interface="http://repo.roscidus.com/python/python">
 	<version before="3"/>
