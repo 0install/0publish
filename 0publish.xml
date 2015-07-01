@@ -39,8 +39,8 @@
       <environment insert="" mode="prepend" name="PYTHONPATH"/>
     </requires>
     <requires interface="http://repo.roscidus.com/security/gnupg">
-      <environment name="PATH" insert="." />
+      <environment insert="." name="PATH"/>
     </requires>
-    <implementation id="." version="0.24-post"/>
+    <implementation id="." released="2015-07-01" version="0.25"/>
   </group>
 </interface>
