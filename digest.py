@@ -57,7 +57,8 @@ def add_digest(impl, alg_name):
 		break
 	else:
 		md = xmltools.create_element(impl, 'manifest-digest')
-	md.setAttribute(alg_name, new_digest.hexdigest())
+	_, digest_value = manifest.splitID(alg.getID(new_digest))
+	md.setAttribute(alg_name, digest_value)
 
 	return True
 
