@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 import sys, logging
-from StringIO import StringIO
+from io import StringIO
 from zeroinstall.injector.reader import InvalidInterface
 import unittest
 
@@ -56,12 +56,12 @@ class TestValidator(unittest.TestCase):
 	def testInvalid(self):
 		try:
 			check(header)
-		except InvalidInterface, ex:
+		except InvalidInterface as ex:
 			assert "no element found" in str(ex), ex
 
 		try:
 			check(header + "<implementation/>" + footer)
-		except InvalidInterface, ex:
+		except InvalidInterface as ex:
 			assert "Missing 'id' attribute" in str(ex), ex
 
 suite = unittest.makeSuite(TestValidator)

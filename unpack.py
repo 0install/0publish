@@ -15,12 +15,12 @@ def recent_gnu_tar():
 	global _recent_gnu_tar
 	if _recent_gnu_tar is None:
 		_recent_gnu_tar = False
-		version = os.popen('tar --version 2>&1').next()
+		version = next(os.popen('tar --version 2>&1'))
 		if '(GNU tar)' in version:
 			try:
 				version = version.split(')', 1)[1].strip()
 				assert version
-				version = map(int, version.split('.'))
+				version = list(map(int, version.split('.')))
 				_recent_gnu_tar = version > [1, 13, 92]
 			except:
 				warn("Failed to extract GNU tar version number")

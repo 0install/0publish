@@ -25,10 +25,10 @@ def check_signature(path):
 	for sig in sigs:
 		if isinstance(sig, gpg.ValidSig):
 			return data, sign_fn, sig.fingerprint
-	print "ERROR: No valid signatures found!"
+	print("ERROR: No valid signatures found!")
 	for sig in sigs:
-		print "Got:", sig
-	ok = raw_input('Ignore and load anyway? (y/N) ').lower()
+		print("Got:", sig)
+	ok = input('Ignore and load anyway? (y/N) ').lower()
 	if ok and 'yes'.startswith(ok):
 		import __main__
 		__main__.force_save = True
@@ -47,7 +47,7 @@ def write_tmp(path, data):
 
 	umask = os.umask(0)
 	os.umask(umask)
-	os.chmod(tmp, 0644 & ~umask)
+	os.chmod(tmp, 0o644 & ~umask)
 
 	return tmp
 
@@ -98,4 +98,4 @@ def export_key(dir, fingerprint):
 	shutil.copyfileobj(stream, key_stream)
 	stream.close()
 	key_stream.close()
-	print "Exported public key as '%s'" % key_file
+	print("Exported public key as '%s'" % key_file)

@@ -18,7 +18,7 @@ def ro_rmtree(root):
 	@type root: str
 	@since: 0.28"""
 	for main, dirs, files in os.walk(root):
-		os.chmod(main, 0700)
+		os.chmod(main, 0o700)
 	shutil.rmtree(root)
 
 def manifest_for_dir(dir, alg):

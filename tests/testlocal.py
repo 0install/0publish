@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-import sys, os, tempfile, StringIO
+import sys, os, tempfile, io
 from zeroinstall.injector.namespaces import XMLNS_IFACE
 from zeroinstall.injector.reader import InvalidInterface
 from zeroinstall.injector import model, reader, qdom
@@ -22,7 +22,7 @@ footer = """
 """
 
 def parse(xml):
-	stream = StringIO.StringIO(xml)
+	stream = io.StringIO(xml)
 	return model.ZeroInstallFeed(qdom.parse(stream))
 
 local_file = os.path.join(os.path.dirname(__file__), 'local.xml')
@@ -335,14 +335,14 @@ class TestLocal(unittest.TestCase):
 	def testSetAtttibs(self):
 		local_data = open(local_file).read()
 		result = release.set_attributes(local_data, '0.2', id = 'sha1=98765', version='3.7', main = None)
-		feed = model.ZeroInstallFeed(qdom.parse(StringIO.StringIO(str(result))), "local.xml")
+		feed = model.ZeroInstallFeed(qdom.parse(io.StringIO(str(result))), "local.xml")
 		assert len(feed.implementations) == 1
 		assert feed.implementations['sha1=98765'].get_version() == '3.7'
 
 		try:
 			result = release.set_attributes(local_data, '0.3', id = 'sha1=98765', version='3.7', main = None)
 			assert 0
-		except Exception, ex:
+		except Exception as ex:
 			assert str(ex) == 'No implementations with version=0.3'
 
 suite = unittest.makeSuite(TestLocal)
