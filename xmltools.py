@@ -104,7 +104,7 @@ def remove_element(elem):
 def format_para(para):
 	"""Turn new-lines into spaces, removing any blank lines."""
 	lines = [l.strip() for l in para.split('\n')]
-	return ' '.join([_f for _f in lines if _f])
+	return ' '.join([l for l in lines if l])
 
 def attrs_match(elem, attrs):
 	for x in attrs:

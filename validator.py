@@ -1,4 +1,4 @@
-import os, io, io
+import os, io
 from zeroinstall.injector import model, namespaces, qdom
 from zeroinstall.injector.reader import InvalidInterface, update
 from xml.dom import minidom, Node, XMLNS_NAMESPACE
