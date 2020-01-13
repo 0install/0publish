@@ -1,11 +1,7 @@
 from xml.dom import minidom
 from zeroinstall import SafeException
 from zeroinstall.zerostore import manifest
-try:
-	from zeroinstall.zerostore import unpack
-except ImportError:
-	# Older versions don't have it
-	import unpack
+from zeroinstall.zerostore import unpack
 from zeroinstall.injector import namespaces
 import os, shutil, tempfile
 
@@ -35,7 +31,7 @@ def manifest_for_dir(dir, alg):
 
 	digest = algorithm.new_digest()
 	for line in algorithm.generate_manifest(dir):
-		digest.update(line + '\n')
+		digest.update((line + '\n').encode())
 	return algorithm.getID(digest)
 
 def autopackage_get_start_offset(package):
@@ -65,10 +61,11 @@ def add_archive(data, url, local_file, extract, algs):
 	all_impls = doc.documentElement.getElementsByTagNameNS(namespaces.XMLNS_IFACE, 'implementation')
 	tmpdir = tempfile.mkdtemp('-0publish')
 	try:
-		if start_offset or type:
-			unpack.unpack_archive(url, file(local_file), tmpdir, extract, start_offset = start_offset, type = type)
-		else:
-			unpack.unpack_archive(url, file(local_file), tmpdir, extract)
+		with open(local_file, 'rb') as stream:
+			if start_offset or type:
+				unpack.unpack_archive(url, stream, tmpdir, extract, start_offset = start_offset, type = type)
+			else:
+				unpack.unpack_archive(url, stream, tmpdir, extract)
 		if extract:
 			extracted = os.path.join(tmpdir, extract)
 		else:

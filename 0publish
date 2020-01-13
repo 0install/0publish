@@ -73,7 +73,8 @@ try:
 	# Load or create the starting data...
 
 	if os.path.exists(interface):
-		contents = file(interface).read()
+		with open(interface, 'rb') as stream:
+			contents = stream.read()
 		data, sign_fn, key = signing.check_signature(interface)
 	elif options.add_from:
 		if os.path.exists(options.add_from):
@@ -195,7 +196,7 @@ try:
 	data = create.xml_header + doc.documentElement.toxml('utf-8')
 
 	# Write it back out
-	if not data.endswith('\n'): data += '\n'
+	if not data.endswith(b'\n'): data += b'\n'
 	sign_fn(interface, data, key)
 
 	info("Wrote '%s'", interface)
@@ -203,7 +204,8 @@ try:
 	if sign_fn != signing.sign_unsigned:
 		# Read it back in to find out what key we signed it with
 		# and ensure that the key has been exported
-		contents = file(interface).read()
+		with open(interface, 'rb') as stream:
+			contents = stream.read()
 		saved_data, saved_sign_fn, saved_key = signing.check_signature(interface)
 		assert saved_data == data
 		assert saved_sign_fn == sign_fn

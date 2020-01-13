@@ -1,16 +1,13 @@
 #!/usr/bin/env python
+
+# For a coverage report:
+# 0install run -w 'shift; python3-coverage run' --command=test ../0publish.xml
+# python3-coverage html
+
 import unittest, os, sys
 for x in ['LANGUAGE', 'LANG']:
 	if x in os.environ:
 		del os.environ[x]
-try:
-	import coverage
-	coverage.use_cache(False)
-	coverage.erase()
-	coverage.start()
-except ImportError:
-	coverage = None
-
 my_dir = os.path.dirname(sys.argv[0])
 if not my_dir:
 	my_dir = os.getcwd()
@@ -32,20 +29,6 @@ else:
 
 a = unittest.TextTestRunner(verbosity=2).run(alltests)
 
-if coverage:
-	coverage.stop()
-else:
-	print("Coverage module not found. Skipping coverage report.")
-
 print("\nResult", a)
 if not a.wasSuccessful():
 	sys.exit(1)
-
-if coverage:
-	all_sources = []
-	def incl(d):
-		for x in os.listdir(d):
-			if x.endswith('.py'):
-				all_sources.append(os.path.join(d, x))
-	incl('..')
-	coverage.report(all_sources + ['../0publish'])

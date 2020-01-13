@@ -26,12 +26,12 @@
   <group license="OSI Approved :: GNU Lesser General Public License (LGPL)" main="0publish">
     <command name="run" path="0publish">
       <runner interface="https://apps.0install.net/python/python.xml">
-	<version before="3"/>
+	<version not-before="3"/>
       </runner>
     </command>
     <command name="test" path="tests/testall.py">
       <runner interface="https://apps.0install.net/python/python.xml">
-	<version before="3"/>
+	<version not-before="3"/>
       </runner>
     </command>
     <requires interface="http://0install.net/2007/interfaces/ZeroInstall.xml">

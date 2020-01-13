@@ -5,14 +5,16 @@ import subprocess
 from logging import warn
 
 def check_signature(path):
-	data = file(path).read()
-	xml_comment = data.rfind('\n<!-- Base64 Signature')
+	with open(path, 'rb') as stream:
+		data = stream.read()
+	xml_comment = data.rfind(b'\n<!-- Base64 Signature')
 	if xml_comment >= 0:
-		data_stream, sigs = gpg.check_stream(file(path))
+		with open(path, 'rb') as stream:
+			data_stream, sigs = gpg.check_stream(stream)
 		sign_fn = sign_xml
 		data = data[:xml_comment + 1]
 		data_stream.close()
-	elif data.startswith('-----BEGIN'):
+	elif data.startswith(b'-----BEGIN'):
 		warn("Plain GPG signatures are no longer supported - not checking signature!")
 		warn("Will save in XML format.")
 		child = subprocess.Popen(['gpg', '--decrypt', path], stdout = subprocess.PIPE)
@@ -41,7 +43,7 @@ def write_tmp(path, data):
 	if tmpdir:
 		assert os.path.isdir(tmpdir), "Not a directory: " + tmpdir
 	fd, tmp = tempfile.mkstemp(prefix = 'tmp-', dir = tmpdir)
-	stream = os.fdopen(fd, 'w')
+	stream = os.fdopen(fd, 'wb')
 	stream.write(data)
 	stream.close()
 
@@ -71,9 +73,10 @@ def sign_xml(path, data, key):
 		run_gpg(key, '--detach-sign', '--output', sigtmp, tmp)
 	finally:
 		os.unlink(tmp)
-	encoded = base64.encodestring(file(sigtmp).read())
+	with open(sigtmp, 'rb') as stream:
+		encoded = base64.encodestring(stream.read())
 	os.unlink(sigtmp)
-	sig = "<!-- Base64 Signature\n" + encoded + "\n-->\n"
+	sig = b"<!-- Base64 Signature\n" + encoded + b"\n-->\n"
 	support.portable_rename(write_tmp(path, data + sig), path)
 
 def export_key(dir, fingerprint):
@@ -93,9 +96,8 @@ def export_key(dir, fingerprint):
 	key_file = os.path.join(dir, keyID + '.gpg')
 	if os.path.isfile(key_file):
 		return
-	key_stream = file(key_file, 'w')
-	stream = os.popen("gpg -a --export '%s'" % fingerprint)
-	shutil.copyfileobj(stream, key_stream)
-	stream.close()
-	key_stream.close()
+	with open(key_file, 'wb') as key_stream:
+		stream = os.popen("gpg -a --export '%s'" % fingerprint, mode = 'rb')
+		shutil.copyfileobj(stream, key_stream)
+		stream.close()
 	print("Exported public key as '%s'" % key_file)

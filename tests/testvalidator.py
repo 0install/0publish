@@ -34,7 +34,7 @@ def check(xml, expectWarnings = ""):
 	old_stderr = sys.stderr
 	try:
 		sys.stderr = my_log_stream
-		validator.check(xml)
+		validator.check(xml.encode())
 		warnings = my_log_stream.getvalue()
 	finally:
 		sys.stderr = old_stderr

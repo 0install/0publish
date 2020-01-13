@@ -22,7 +22,7 @@ footer = """
 """
 
 def parse(xml):
-	stream = io.StringIO(xml)
+	stream = io.BytesIO(xml)
 	return model.ZeroInstallFeed(qdom.parse(stream))
 
 local_file = os.path.join(os.path.dirname(__file__), 'local.xml')
@@ -335,7 +335,7 @@ class TestLocal(unittest.TestCase):
 	def testSetAtttibs(self):
 		local_data = open(local_file).read()
 		result = release.set_attributes(local_data, '0.2', id = 'sha1=98765', version='3.7', main = None)
-		feed = model.ZeroInstallFeed(qdom.parse(io.StringIO(str(result))), "local.xml")
+		feed = model.ZeroInstallFeed(qdom.parse(io.BytesIO(result)), "local.xml")
 		assert len(feed.implementations) == 1
 		assert feed.implementations['sha1=98765'].get_version() == '3.7'
 

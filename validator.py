@@ -96,7 +96,7 @@ def check(data, warnings = True):
 			local_path = None
 		else:
 			local_path = '/tmp/local.xml'
-		model.ZeroInstallFeed(qdom.parse(io.StringIO(data)), local_path = local_path)
+		model.ZeroInstallFeed(qdom.parse(io.BytesIO(data)), local_path = local_path)
 	except InvalidInterface as ex:
 		raise
 	except Exception as ex:
