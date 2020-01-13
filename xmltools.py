@@ -104,7 +104,7 @@ def remove_element(elem):
 def format_para(para):
 	"""Turn new-lines into spaces, removing any blank lines."""
 	lines = [l.strip() for l in para.split('\n')]
-	return ' '.join(filter(None, lines))
+	return ' '.join([l for l in lines if l])
 
 def attrs_match(elem, attrs):
 	for x in attrs:
@@ -159,7 +159,7 @@ def register_namespace(namespace, prefix = None):
 	# Find a variation on 'prefix' that isn't used yet, if necessary
 	orig_prefix = prefix
 	n = 0
-	while prefix in namespace_prefixes.values():
+	while prefix in list(namespace_prefixes.values()):
 		#print "Prefix %s already in %s, not %s" % (prefix, namespace_prefixes, namespace)
 		n += 1
 		prefix = orig_prefix + str(n)

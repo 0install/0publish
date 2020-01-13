@@ -41,13 +41,13 @@ parser.add_option("-V", "--version", help="display version information", action=
 force_save = options.create
 
 if options.version:
-	print "0publish (zero-install) " + version
-	print "Copyright (C) 2005-2010 Thomas Leonard"
-	print "This program comes with ABSOLUTELY NO WARRANTY,"
-	print "to the extent permitted by law."
-	print "You may redistribute copies of this program"
-	print "under the terms of the GNU General Public License."
-	print "For more information about these matters, see the file named COPYING."
+	print("0publish (zero-install) " + version)
+	print("Copyright (C) 2005-2010 Thomas Leonard")
+	print("This program comes with ABSOLUTELY NO WARRANTY,")
+	print("to the extent permitted by law.")
+	print("You may redistribute copies of this program")
+	print("under the terms of the GNU General Public License.")
+	print("For more information about these matters, see the file named COPYING.")
 	sys.exit(0)
 
 if options.verbose:
@@ -65,7 +65,7 @@ interface = args[0]
 
 def confirm(q):
 	while True:
-		ans = raw_input(q + " [Y/N] ").lower()
+		ans = input(q + " [Y/N] ").lower()
 		if ans in ('y', 'yes'): return True
 		if ans in ('n', 'no'): return False
 
@@ -73,7 +73,8 @@ try:
 	# Load or create the starting data...
 
 	if os.path.exists(interface):
-		contents = file(interface).read()
+		with open(interface, 'rb') as stream:
+			contents = stream.read()
 		data, sign_fn, key = signing.check_signature(interface)
 	elif options.add_from:
 		if os.path.exists(options.add_from):
@@ -109,11 +110,11 @@ try:
 		try:
 			validator.check(data, warnings = False)	# Don't warn on load AND save!
 			break
-		except validator.InvalidInterface, ex:
-			print "Invalid interface: " + str(ex)
+		except validator.InvalidInterface as ex:
+			print("Invalid interface: " + str(ex))
 
 		while True:
-			ans = raw_input("Interface is invalid. (E)dit or (A)bort?").lower()
+			ans = input("Interface is invalid. (E)dit or (A)bort?").lower()
 			if ans in ('e', 'edit'):
 				data = edit.edit(data)
 				options.edit = False	# Don't edit twice
@@ -126,7 +127,7 @@ try:
 	if options.unsign:
 		sign_fn = signing.sign_unsigned
 	if options.key:
-		print "Changing key from '%s' to '%s'" % (key, options.key)
+		print("Changing key from '%s' to '%s'" % (key, options.key))
 		key = options.key
 	if options.set_interface_uri:
 		import release
@@ -176,18 +177,18 @@ try:
 		try:
 			validator.check(data)
 			break
-		except validator.InvalidInterface, ex:
-			print "Invalid interface: " + str(ex)
+		except validator.InvalidInterface as ex:
+			print("Invalid interface: " + str(ex))
 
 		while True:
-			ans = raw_input("Interface is invalid. (E)dit or (A)bort?").lower()
+			ans = input("Interface is invalid. (E)dit or (A)bort?").lower()
 			if ans in ('e', 'edit'):
 				data = edit.edit(data)
 				break
 			if ans in ('a', 'abort'): sys.exit(1)
 
 	if (old_data == data and sign_fn == old_sign_fn and key == old_key) and not force_save:
-		print "Interface unchanged. Not writing."
+		print("Interface unchanged. Not writing.")
 		sys.exit(1)
 
 	# Tidy up the XML
@@ -195,7 +196,7 @@ try:
 	data = create.xml_header + doc.documentElement.toxml('utf-8')
 
 	# Write it back out
-	if not data.endswith('\n'): data += '\n'
+	if not data.endswith(b'\n'): data += b'\n'
 	sign_fn(interface, data, key)
 
 	info("Wrote '%s'", interface)
@@ -203,15 +204,16 @@ try:
 	if sign_fn != signing.sign_unsigned:
 		# Read it back in to find out what key we signed it with
 		# and ensure that the key has been exported
-		contents = file(interface).read()
+		with open(interface, 'rb') as stream:
+			contents = stream.read()
 		saved_data, saved_sign_fn, saved_key = signing.check_signature(interface)
 		assert saved_data == data
 		assert saved_sign_fn == sign_fn
 		signing.export_key(os.path.dirname(interface), saved_key)
-except KeyboardInterrupt, ex:
-	print >>sys.stderr, "Aborted at user's request"
+except KeyboardInterrupt as ex:
+	print("Aborted at user's request", file=sys.stderr)
 	sys.exit(1)
-except SafeException, ex:
+except SafeException as ex:
 	if options.verbose: raise
-	print >>sys.stderr, ex
+	print(ex, file=sys.stderr)
 	sys.exit(1)

@@ -99,11 +99,11 @@ def nodesEqual(a, b):
 def score_subset(group, impl):
 	"""Returns (is_subset, goodness)"""
 	for key in group.attribs:
-		if key not in impl.attribs.keys():
+		if key not in list(impl.attribs.keys()):
 			#print "BAD", key
 			return (0,)		# Group sets an attribute the impl doesn't want
 	matching_commands = 0
-	for name_expr, g_command in group.commands.iteritems():
+	for name_expr, g_command in group.commands.items():
 		if name_expr not in impl.commands:
 			return (0,)		# Group sets a command the impl doesn't want
 		if nodesEqual(g_command, impl.commands[name_expr]):
@@ -169,7 +169,7 @@ def merge(data, local):
 			need_new_group_for_main = False
 
 		new_commands = []
-		for name_expr, new_command in new_impl_context.commands.iteritems():
+		for name_expr, new_command in new_impl_context.commands.items():
 			if need_new_group_for_main and name_expr[0] == 'run':
 				# If we're creating a new <group main='...'> then we can't inherit an existing <command name='run'/>,
 				old_command = None

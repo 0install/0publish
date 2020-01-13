@@ -19,7 +19,7 @@ def add_version(data, version):
 	new_impl.setAttribute('id', '.')
 
 	if not all_impls:
-		print 'No existing <implementation> elements found; creating first one!'
+		print('No existing <implementation> elements found; creating first one!')
 		next = None
 		last_impl = doc.documentElement.childNodes[-1]
 	else:

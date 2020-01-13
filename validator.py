@@ -1,4 +1,4 @@
-import os, io, StringIO
+import os, io
 from zeroinstall.injector import model, namespaces, qdom
 from zeroinstall.injector.reader import InvalidInterface, update
 from xml.dom import minidom, Node, XMLNS_NAMESPACE
@@ -96,10 +96,10 @@ def check(data, warnings = True):
 			local_path = None
 		else:
 			local_path = '/tmp/local.xml'
-		model.ZeroInstallFeed(qdom.parse(StringIO.StringIO(data)), local_path = local_path)
-	except InvalidInterface, ex:
+		model.ZeroInstallFeed(qdom.parse(io.BytesIO(data)), local_path = local_path)
+	except InvalidInterface as ex:
 		raise
-	except Exception, ex:
+	except Exception as ex:
 		warn("Internal error: %s", ex)
 		raise InvalidInterface(str(ex))
 	

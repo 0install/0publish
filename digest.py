@@ -29,7 +29,10 @@ def add_digest(impl, alg_name):
 	# - Otherwise, find a cached implementation we can use
 	existing_path = None
 	for a, value in digests(impl):
-		digest = '%s=%s' % (a, value)
+		if a in ('sha1', 'sha1new', 'sha256'):
+			digest = '%s=%s' % (a, value)
+		else:
+			digest = '%s_%s' % (a, value)
 		if a == alg_name:
 			return False			# Already signed with this algorithm
 		if not existing_path:
@@ -41,17 +44,17 @@ def add_digest(impl, alg_name):
 				pass		# OK
 
 	if existing_path is None:
-		print "No implementations of %s cached; can't calculate new digest" % get_version(impl)
+		print("No implementations of %s cached; can't calculate new digest" % get_version(impl))
 		return False
 
 	info("Verifying %s", existing_path)
 	manifest.verify(existing_path, existing_digest)
 
-	print "Adding new digest to version %s" % get_version(impl)
+	print("Adding new digest to version %s" % get_version(impl))
 
 	new_digest = alg.new_digest()
 	for line in alg.generate_manifest(existing_path):
-		new_digest.update(line + '\n')
+		new_digest.update((line + '\n').encode())
 
 	for md in xmltools.children(impl, 'manifest-digest'):
 		break

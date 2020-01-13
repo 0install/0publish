@@ -14,7 +14,7 @@ def available_in_path(command):
 def edit(data):
 	fd, tmp = tempfile.mkstemp(prefix = '0publish-', suffix = '.xml')
 	try:
-		stream = os.fdopen(fd, 'w')
+		stream = os.fdopen(fd, 'wb')
 		stream.write(data)
 		stream.close()
 		editor = os.environ.get('EDITOR', None)
@@ -28,7 +28,8 @@ def edit(data):
 		info("Editing tmp file with '%s %s'..." % (editor, tmp))
 		if os.spawnlp(os.P_WAIT, editor, editor, tmp):
 			raise Exception('Editing with $EDITOR ("%s") failed' % editor)
-		new_data = file(tmp).read()
+		with open(tmp, 'rb') as stream:
+			new_data = stream.read()
 	finally:
 		os.unlink(tmp)
 	return new_data

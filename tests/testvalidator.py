@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 import sys, logging
-from StringIO import StringIO
+from io import StringIO
 from zeroinstall.injector.reader import InvalidInterface
 import unittest
 
@@ -34,7 +34,7 @@ def check(xml, expectWarnings = ""):
 	old_stderr = sys.stderr
 	try:
 		sys.stderr = my_log_stream
-		validator.check(xml)
+		validator.check(xml.encode())
 		warnings = my_log_stream.getvalue()
 	finally:
 		sys.stderr = old_stderr
@@ -56,12 +56,12 @@ class TestValidator(unittest.TestCase):
 	def testInvalid(self):
 		try:
 			check(header)
-		except InvalidInterface, ex:
+		except InvalidInterface as ex:
 			assert "no element found" in str(ex), ex
 
 		try:
 			check(header + "<implementation/>" + footer)
-		except InvalidInterface, ex:
+		except InvalidInterface as ex:
 			assert "Missing 'id' attribute" in str(ex), ex
 
 suite = unittest.makeSuite(TestValidator)
