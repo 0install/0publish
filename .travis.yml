@@ -1,8 +1,8 @@
-language: c
+language: python
+python:
+  - "3.4"
+  - "3.8"
+dist: bionic
 sudo: false
 install: bash -e .travis-install.sh
-addons:
-  apt:
-    packages:
-    - python-gobject
 script: 0test 0publish.xml
