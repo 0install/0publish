@@ -41,6 +41,6 @@
     <requires interface="https://apps.0install.net/utils/gnupg.xml">
       <environment insert="." name="PATH"/>
     </requires>
-    <implementation id="." released="2020-01-14" version="0.26"/>
+    <implementation id="." version="0.26-post"/>
   </group>
 </interface>
