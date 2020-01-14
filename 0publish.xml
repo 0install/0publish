@@ -1,4 +1,5 @@
 <?xml version="1.0" ?>
+<?xml-stylesheet type='text/xsl' href='interface.xsl'?>
 <interface xmlns="http://zero-install.sourceforge.net/2004/injector/interface">
   <name>0publish</name>
   <summary>utility to make creating injector interfaces easier</summary>
@@ -40,6 +41,6 @@
     <requires interface="https://apps.0install.net/utils/gnupg.xml">
       <environment insert="." name="PATH"/>
     </requires>
-    <implementation id="." version="0.25-post"/>
+    <implementation id="." released="2020-01-14" version="0.26"/>
   </group>
 </interface>
