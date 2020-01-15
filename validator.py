@@ -32,7 +32,7 @@ known_elements = {
 	'recipe' : [],
 	'requires' : ['interface', 'use', 'importance', 'os', 'version'],
 	'restricts' : ['interface', 'os', 'version'],
-	'runner' : ['interface', 'use', 'importance', 'command'],
+	'runner' : ['interface', 'use', 'importance', 'command', 'version'],
 	'version' : ['not-before', 'before'],
 	'environment' : ['name', 'insert', 'value', 'default', 'mode', 'separator'],
 	'executable-in-var' : ['name', 'command'],
