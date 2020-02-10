@@ -13,7 +13,7 @@ def mark_stable(data):
 	if len(testing) == 0:
 		raise Exception('No implementations are currently "testing"!')
 
-	testing = sorted(testing)
+	testing = sorted(testing, key = lambda x: x[0])
 	higest_version = testing[-1][0]
 	latest_testing = [impl for version, impl in testing if version == higest_version]
 
