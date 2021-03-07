@@ -22,17 +22,16 @@
     <release:action phase="commit-release">sed -i &quot;s/^version = '.*'$/version = '$RELEASE_VERSION'/&quot; 0publish</release:action>
   </release:management>
 
-  <feed-for interface="http://0install.net/2006/interfaces/0publish"/>
+  <feed-for interface="https://apps.0install.net/0install/0publish.xml"/>
 
-  <group license="OSI Approved :: GNU Lesser General Public License (LGPL)" main="0publish">
-    <requires interface="https://apps.0install.net/python/python.xml" version='3..'/>
+  <group license="OSI Approved :: GNU Lesser General Public License (LGPL)">
     <command name="run" path="0publish">
-      <runner interface="https://apps.0install.net/python/python.xml"/>
+      <runner interface="https://apps.0install.net/python/python.xml" version="3.."/>
     </command>
     <command name="test" path="tests/testall.py">
-      <runner interface="https://apps.0install.net/python/python.xml"/>
+      <runner interface="https://apps.0install.net/python/python.xml" version="3.."/>
     </command>
-    <requires interface="http://0install.net/2007/interfaces/ZeroInstall.xml">
+    <requires interface="https://apps.0install.net/0install/0install-python.xml">
       <environment insert="" mode="prepend" name="PYTHONPATH"/>
     </requires>
     <requires interface="https://apps.0install.net/utils/gnupg.xml">
