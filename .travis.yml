@@ -1,5 +1,8 @@
 language: c
 sudo: false
+cache:
+  directories:
+  - $HOME/.cache/0install.net
 install: bash -e .travis-install.sh
 addons:
   apt:
