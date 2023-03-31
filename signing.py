@@ -74,7 +74,7 @@ def sign_xml(path, data, key):
 	finally:
 		os.unlink(tmp)
 	with open(sigtmp, 'rb') as stream:
-		encoded = base64.encodestring(stream.read())
+		encoded = base64.encodebytes(stream.read())
 	os.unlink(sigtmp)
 	sig = b"<!-- Base64 Signature\n" + encoded + b"\n-->\n"
 	support.portable_rename(write_tmp(path, data + sig), path)
@@ -97,7 +97,7 @@ def export_key(dir, fingerprint):
 	if os.path.isfile(key_file):
 		return
 	with open(key_file, 'wb') as key_stream:
-		stream = os.popen("gpg -a --export '%s'" % fingerprint, mode = 'rb')
+		stream = os.popen("gpg -a --export '%s'" % fingerprint, mode = 'r')
 		shutil.copyfileobj(stream, key_stream)
 		stream.close()
 	print("Exported public key as '%s'" % key_file)
