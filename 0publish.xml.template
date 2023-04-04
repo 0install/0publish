@@ -32,8 +32,9 @@
     <requires interface="https://apps.0install.net/utils/gnupg.xml">
       <environment insert="." name="PATH"/>
     </requires>
-
-    <!-- Use very high version number to treat local build as newer than any public version. -->
-    <implementation id="local" version="100-pre" stability="developer" local-path="."/>
+    <implementation version="{version}" local-path=".">
+      <manifest-digest/>
+      <archive href="0publish-{version}.tar.bz2"/>
+    </implementation>
   </group>
 </interface>
