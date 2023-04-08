@@ -53,24 +53,25 @@ def write_tmp(path, data):
 
 	return tmp
 
-def run_gpg(default_key, *arguments):
+def run_gpg(default_key, gpg_passphrase, *arguments):
 	arguments = list(arguments)
+	if gpg_passphrase is not None:
+		arguments = ['--passphrase', gpg_passphrase] + arguments
 	if default_key is not None:
-		arguments = ['--default-key', default_key] + arguments
-	arguments.insert(0, '--use-agent')
+		arguments = ['--local-user', default_key] + arguments
 	arguments.insert(0, 'gpg')
 	import subprocess
 	if subprocess.call(arguments):
 		raise SafeException("Command '%s' failed" % arguments)
 
-def sign_unsigned(path, data, key):
+def sign_unsigned(path, data, key, gpg_passphrase):
 	support.portable_rename(write_tmp(path, data), path)
 
-def sign_xml(path, data, key):
+def sign_xml(path, data, key, gpg_passphrase):
 	tmp = write_tmp(path, data)
 	sigtmp = tmp + '.sig'
 	try:
-		run_gpg(key, '--detach-sign', '--output', sigtmp, tmp)
+		run_gpg(key, gpg_passphrase, '--detach-sign', '--output', sigtmp, tmp)
 	finally:
 		os.unlink(tmp)
 	with open(sigtmp, 'rb') as stream:
