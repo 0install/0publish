@@ -98,7 +98,7 @@ def export_key(dir, fingerprint):
 	if os.path.isfile(key_file):
 		return
 	with open(key_file, 'w') as key_stream:
-		stream = os.popen("gpg -a --export '%s'" % fingerprint, mode = 'r')
+		stream = os.popen("gpg -a --export %s" % fingerprint, mode = 'r')
 		data = stream.read()
 		key_stream.write(data)
 		stream.close()
