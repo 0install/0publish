@@ -20,6 +20,7 @@ parser.add_option("-c", "--create", help="create file if nonexistant", action='s
 parser.add_option("-d", "--add-digest", help="add extra digests", action='store', metavar='ALG')
 parser.add_option("-e", "--edit", help="edit with $EDITOR", action='store_true')
 parser.add_option("-k", "--key", help="key to use for signing")
+parser.add_option("--gpg-passphrase", help="Use PASS to unlock the private GPG key", metavar="PASS")
 parser.add_option("-l", "--local", help="deprecated; use --add-from instead", dest='add_from', metavar='LOCAL')
 parser.add_option("--manifest-algorithm", help="select algorithm for manifests", action='append', metavar='ALG')
 parser.add_option("--set-interface-uri", help="set interface URI", action='store', metavar='URI')
@@ -197,7 +198,7 @@ try:
 
 	# Write it back out
 	if not data.endswith(b'\n'): data += b'\n'
-	sign_fn(interface, data, key)
+	sign_fn(interface, data, key, options.gpg_passphrase)
 
 	info("Wrote '%s'", interface)
 
