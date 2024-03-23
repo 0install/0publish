@@ -6,13 +6,14 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       # Prepare
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           fetch-depth: 0
-      - uses: gittools/actions/gitversion/setup@v0.10.2
+          show-progress: false
+      - uses: gittools/actions/gitversion/setup@v1.1.1
         with:
           versionSpec: '5.12.x'
-      - uses: gittools/actions/gitversion/execute@v0.10.2
+      - uses: gittools/actions/gitversion/execute@v1.1.1
         id: gitversion
 
       # Build
