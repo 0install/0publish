@@ -1,23 +1,20 @@
 <?xml version="1.0" ?>
-<?xml-stylesheet type='text/xsl' href='interface.xsl'?>
 <interface xmlns="http://zero-install.sourceforge.net/2004/injector/interface">
   <name>0publish</name>
-  <summary>utility to make creating injector interfaces easier</summary>
+  <summary>utility for creating and modifying Zero Install feeds</summary>
   <description>
-    0publish makes creating and modifying injector interface files easier.
+    0publish makes creating and modifying Zero Install feed files easier.
     It can create a new commented template for you or edit an existing one.
 
     Various editing operations are available, the most basic being to let you
     edit it in your preferred text editor. It automatically removes the
     signature when loading an interface and creates a new one when writing it
     back out. It will also validate the new version before saving it.
-
-    A tutorial on 0publish can be found at
-    https://docs.0install.net/packaging/.
   </description>
   <homepage>https://docs.0install.net/tools/0publish/</homepage>
+  <needs-terminal/>
 
-  <feed-for interface="https://apps.0install.net/0install/0publish.xml"/>
+  <feed-for interface="https://apps.0install.net/0install/0publish-python.xml"/>
 
   <group license="OSI Approved :: GNU Lesser General Public License (LGPL)">
     <command name="run" path="0publish">
