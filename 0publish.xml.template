@@ -16,7 +16,7 @@
 
   <feed-for interface="https://apps.0install.net/0install/0publish-python.xml"/>
 
-  <group license="OSI Approved :: GNU Lesser General Public License (LGPL)">
+  <group license="LGPL-2.1-or-later">
     <command name="run" path="0publish">
       <runner interface="https://apps.0install.net/python/python.xml" version="3.."/>
     </command>
